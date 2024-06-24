@@ -127,6 +127,9 @@ public class TbFormServiceImpl extends AbstractFormServiceImpl implements FormSe
 
     @Override
     public List<WflowFormRecord> updateInstanceFormData(String userId, String instanceId, Map<String, Object> formData) {
+        if (CollectionUtil.isEmpty(formData)) {
+            return Collections.emptyList();
+        }
         List<WflowFormRecord> records = new ArrayList<>(formData.size());
         Date time = GregorianCalendar.getInstance().getTime();
         //先查询出来所有的表单字段
