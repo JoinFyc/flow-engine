@@ -8,8 +8,10 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wflow.bean.entity.WflowFormData;
 import com.wflow.bean.entity.WflowFormRecord;
+import com.wflow.bean.entity.WflowModelHistorys;
 import com.wflow.bean.entity.WflowModels;
 import com.wflow.mapper.WflowFormDataMapper;
+import com.wflow.mapper.WflowModelHistorysMapper;
 import com.wflow.mapper.WflowModelsMapper;
 import com.wflow.workflow.bean.process.form.Form;
 import com.wflow.workflow.bean.vo.FormAbstractsVo;
@@ -43,6 +45,9 @@ public class TbFormServiceImpl extends AbstractFormServiceImpl implements FormSe
 
     @Autowired
     private WflowModelsMapper modelsMapper;
+
+    @Autowired
+    private WflowModelHistorysMapper historysMapper;
 
     @Override
     public Map<String, Object> getProcessInstanceFormData(String instanceId) {
@@ -93,9 +98,9 @@ public class TbFormServiceImpl extends AbstractFormServiceImpl implements FormSe
     public void saveInstanceFormData(String instanceId, Map<String, Object> formData) {
         ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(instanceId).singleResult();
         //提取表单字段信息
-        WflowModels models = modelsMapper.selectOne(new LambdaQueryWrapper<WflowModels>()
-                .select(WflowModels::getFormItems)
-                .eq(WflowModels::getProcessDefId, instance.getProcessDefinitionId()));
+        WflowModelHistorys models = historysMapper.selectOne(new LambdaQueryWrapper<WflowModelHistorys>()
+                .select(WflowModelHistorys::getFormItems)
+                .eq(WflowModelHistorys::getProcessDefId, instance.getProcessDefinitionId()));
         Map<String, Form> formMap = loadFormItemsMap(models.getFormItems());
         List<WflowFormData> collect = formData.entrySet().stream()
                 .filter(v -> null != v.getValue() && formMap.containsKey(v.getKey())).map(entry -> {
