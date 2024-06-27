@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -101,9 +102,11 @@ public class UserTaskListener implements TaskListener, ExecutionListener {
                 log.info("无审批人任务节点[{}]，交付系统控制[审批结果 {}]", nodeId, isAgree);
             } else if (NodeTypeEnum.APPROVAL.equals(node.getType()) && autoSkipRepeatTask(defId, nodeId, instanceId, assignee)){
                 //自动完成任务
+                Authentication.setAuthenticatedUserId(delegateTask.getAssignee());
                 taskService.addComment(delegateTask.getId(), instanceId, JSONObject.toJSONString(
                         new ProcessHandlerParamsVo.ProcessComment("自动处理：任务去重自动通过", Collections.emptyList())
                 ));
+                Authentication.setAuthenticatedUserId(null);
                 delegateTask.setDescription(ProcessHandlerParamsVo.Action.agree.toString());
                 taskService.complete(delegateTask.getId(), MapUtil.of(WflowGlobalVarDef.TASK_RES_PRE + delegateTask.getId(), ProcessHandlerParamsVo.Action.agree));
             } else {

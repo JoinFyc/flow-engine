@@ -253,7 +253,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         //下面都是一样的
         UserDo users = orgRepositoryService.getUserById(instance.getStartUserId());
         OrgUser startUser = OrgUser.builder().id(users.getUserId()).name(users.getUserName()).avatar(users.getAvatar()).build();
-        List<ProcessProgressVo.ProgressNode> taskRecords = getHisTaskRecords(instanceId, nodeProps, approvalResults, signs);
+        List<ProcessProgressVo.ProgressNode> taskRecords = getHisTaskRecords(instanceId, nodeProps, approvalResults, signs, instance.getEndTime());
         //添加抄送
         taskRecords.addAll(getCcTaskRecords(instanceId));
         if (ObjectUtil.isNull(instance.getEndTime())) {
@@ -317,11 +317,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
      * @param nodeProps  节点设置
      * @param varMap     变量
      * @param signs      签名
+     * @param instEndTime 流程实例结束时间
      * @return 历史记录列表
      */
     private List<ProcessProgressVo.ProgressNode> getHisTaskRecords(String instanceId, Map<String, Object> nodeProps,
                                                                    Map<String, ProcessHandlerParamsVo.Action> varMap,
-                                                                   Map<String, String> signs) {
+                                                                   Map<String, String> signs, Date instEndTime) {
         List<HistoricActivityInstance> list = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(instanceId).orderByHistoricActivityInstanceStartTime().asc().list();
         Set<String> userSet = new HashSet<>();
@@ -359,7 +360,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                             .isFuture(false)
                             .name(his.getActivityName())
                             .startTime(his.getStartTime())
-                            .finishTime(his.getEndTime())
+                            .finishTime(Optional.ofNullable(his.getEndTime()).orElse(instEndTime))
                             .comment(commentVos).build();
                     if ("callActivity".equals(his.getActivityType())) {
                         node.setNodeType(NodeTypeEnum.SUBPROC);
