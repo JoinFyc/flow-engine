@@ -1,5 +1,6 @@
 package com.wflow.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +22,15 @@ import java.util.Collections;
 @Configuration
 public class GlobalCorsConfig {//implements Filter {// extends WebMvcConfigurerAdapter {
 
+    @Value("${web.domain}")
+    private String webDomain;
+
     @Bean
     public FilterRegistrationBean filterRegistrationBean() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         //1.允许任何来源
-        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedOrigin(webDomain);
+        corsConfiguration.addAllowedOriginPattern("*");
         //2.允许任何请求头
         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
         //3.允许任何方法
