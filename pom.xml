@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.2.3.RELEASE</version>
+    <version>3.0.5</version>
     <relativePath/>
   </parent>
   
@@ -22,7 +22,8 @@
     <!--项目编码-->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <flowable.version>6.7.2</flowable.version>
+<!--    <flowable.version>6.7.2</flowable.version>-->
+    <flowable.version>7.0.0</flowable.version>
   </properties>
   
   <dependencies>
@@ -38,12 +39,18 @@
       <artifactId>fastjson2</artifactId>
       <version>2.0.40</version>
     </dependency>
-    
+
+<!--    js脚本引擎依赖-->
+    <dependency>
+      <groupId>org.openjdk.nashorn</groupId>
+      <artifactId>nashorn-core</artifactId>
+      <version>15.4</version>
+    </dependency>
     
     <dependency>
       <groupId>com.baomidou</groupId>
       <artifactId>mybatis-plus-boot-starter</artifactId>
-      <version>3.5.4</version>
+      <version>3.5.7</version>
     </dependency>
     
     <!-- MySQL 连接驱动依赖 -->
@@ -56,8 +63,8 @@
     <!-- Sa-Token 权限认证, 在线文档：http://sa-token.dev33.cn/ -->
     <dependency>
       <groupId>cn.dev33</groupId>
-      <artifactId>sa-token-spring-boot-starter</artifactId>
-      <version>1.30.0</version>
+      <artifactId>sa-token-spring-boot3-starter</artifactId>
+      <version>1.34.0</version>
     </dependency>
   
     <dependency>

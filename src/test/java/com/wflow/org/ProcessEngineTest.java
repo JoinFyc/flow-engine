@@ -1,8 +1,5 @@
 package com.wflow.org;
 
-import com.wflow.utils.SpringContextUtil;
-import com.wflow.workflow.config.WflowEngineConfigurationConfigurer;
-import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.engine.*;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -13,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * @author JoinFyc

@@ -4,8 +4,9 @@ import cn.hutool.http.HttpRequest;
 import com.wflow.exception.BusinessException;
 import delight.nashornsandbox.NashornSandbox;
 import delight.nashornsandbox.NashornSandboxes;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import lombok.extern.slf4j.Slf4j;
+
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import javax.script.Invocable;
 import javax.script.ScriptException;

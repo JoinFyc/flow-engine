@@ -14,7 +14,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;

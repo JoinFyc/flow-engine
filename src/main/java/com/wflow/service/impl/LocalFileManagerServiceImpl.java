@@ -13,8 +13,10 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * 本地实现的文件管理服务
@@ -70,7 +72,7 @@ public class LocalFileManagerServiceImpl implements FileManagerService {
     public InputStreamResource getFileById(String fileId, String name, Boolean isSign) throws IOException {
         String path = getPathByOs(true, isSign ? BASE_SIGN_FILE : BASE_DIR_FILE, fileId);
         if (FileUtil.exist(path)){
-          return new InputStreamResource(new FileInputStream(path));
+          return new InputStreamResource(Files.newInputStream(Paths.get(path)));
         }else {
             throw new BusinessException("文件不存在");
         }
