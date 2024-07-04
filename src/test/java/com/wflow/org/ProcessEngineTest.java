@@ -1,16 +1,13 @@
 package com.wflow.org;
 
+import jakarta.annotation.Resource;
 import org.flowable.engine.*;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import jakarta.annotation.Resource;
 
 /**
  * @author JoinFyc
@@ -18,7 +15,7 @@ import jakarta.annotation.Resource;
  * @date 2024-06-27
  */
 @SpringBootTest
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 public class ProcessEngineTest {
 
     @Resource
