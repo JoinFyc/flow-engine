@@ -2,7 +2,6 @@ package com.wflow.workflow.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSONArray;
@@ -72,7 +71,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     private WflowModelHistorysMapper modelHistorysMapper;
 
     @Autowired
-    private ProcessNodeCatchService nodeCatchService;
+    private ProcessNodeCacheService nodeCatchService;
 
     @Autowired
     private RepositoryService repositoryService;
@@ -130,9 +129,16 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         processVar.put(WflowGlobalVarDef.WFLOW_NODE_PROPS, propsMap);
         processVar.put(WflowGlobalVarDef.WFLOW_FORMS, JSONArray.parseArray(wflowModels.getFormItems(), Form.class));
         processVar.put(WflowGlobalVarDef.INITIATOR, userId);
+        //最终审批人的事件Key
+        if(StrUtil.isNotBlank(wflowModels.getBusinessEventKey())) {
+            final ProcessNode<?> lastNode = Objects.requireNonNull(nodeMap.entrySet().stream().reduce((first, second) -> second).orElse(null)).getValue();
+            //TODO 组装事件请求参数
+            processVar.put(WflowGlobalVarDef.LAST_AUDIT_EVENT_TAG,lastNode.getProps());
+        }
         //构造流程实例名称
         String instanceName = orgRepositoryService.getUserById(userId).getUserName() + "发起的" + processDefinition.getName();
         //这样做貌似无效果，变量表不会多INITIATOR变量，但是流程表发起人有效
+        //TODO 流程开启 start
         Authentication.setAuthenticatedUserId(userId);
         ProcessInstance processInstance = managementService.executeCommand(new StartProcessInstanceCmdN<>(
                 instanceName, defId, null, processVar, null));

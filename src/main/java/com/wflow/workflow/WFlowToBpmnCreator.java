@@ -19,10 +19,14 @@ import com.wflow.workflow.task.SubProcessInitTask;
 import com.wflow.workflow.task.TriggerServiceTask;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
+import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.TaskListener;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,7 +38,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class WFlowToBpmnCreator {
-
+    //TODO 并发控制
     //流程元素与ID映射
     private final Map<String, FlowElement> elementMap = new LinkedHashMap<>();
     //节点Map映射，提高取效率
@@ -58,15 +62,21 @@ public class WFlowToBpmnCreator {
     static {
         System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
         FlowableListener taskListener = new FlowableListener();
-        taskListener.setEvent("all");
+        taskListener.setEvent(TaskListener.EVENTNAME_ALL_EVENTS);
         taskListener.setImplementationType("delegateExpression");
         taskListener.setImplementation("${userTaskListener}");
         taskListeners.add(taskListener);
 
+        FlowableListener lastListener = new FlowableListener();
+        lastListener.setEvent(TaskListener.EVENTNAME_COMPLETE);
+        lastListener.setImplementationType("delegateExpression");
+        lastListener.setImplementation("${lastUserTaskEventListener}");
+        taskListeners.add(lastListener);
+
         FlowableListener nodeListener = new FlowableListener();
-        nodeListener.setEvent("end");
+        nodeListener.setEvent(ExecutionListener.EVENTNAME_END);
         nodeListener.setImplementationType("delegateExpression");
-        nodeListener.setImplementation("${userTaskListener}");
+        nodeListener.setImplementation("${nodeExecutionListener}");
         nodeListeners.add(nodeListener);
     }
 
@@ -155,7 +165,7 @@ public class WFlowToBpmnCreator {
      * @param node 当前节点
      */
     private void loadBranchEndNodes(ProcessNode<?> node){
-        if (!hasChildren(node) && currentBranchStack.size() > 0){
+        if (!hasChildren(node) && currentBranchStack.size() > 0){ //TODO currentBranchStack 存在并发问题？
             //没有后续节点，代表该分支部分结束，塞入末端缓存
             Optional.ofNullable(currentBranchStack.peek()).ifPresent(bn -> {
                 List<String> endNodes = footerNode.get(bn.getId());
@@ -513,6 +523,14 @@ public class WFlowToBpmnCreator {
         inclusiveGateway.setId(node.getId());
         inclusiveGateway.setName(NodeTypeEnum.EMPTY.equals(node.getType()) ? "包容分支聚合":"包容分支");
         return inclusiveGateway;
+    }
+
+    //TODO 事件网关
+    private EventGateway createEventGateway(ProcessNode<?> node) {
+        final EventGateway eventGateway = new EventGateway();
+        eventGateway.setId(node.getId());
+        eventGateway.setName(node.getName().concat("事件通知"));
+        return eventGateway;
     }
 
     private SequenceFlow createdConnectLine(String source, String target) {

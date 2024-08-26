@@ -7,44 +7,44 @@ import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wflow.bean.do_.UserDeptDo;
 import com.wflow.bean.do_.UserDo;
 import com.wflow.bean.entity.WflowModelHistorys;
+import com.wflow.bean.entity.WflowModels;
 import com.wflow.bean.entity.WflowUserAgents;
 import com.wflow.exception.BusinessException;
 import com.wflow.mapper.WflowModelHistorysMapper;
+import com.wflow.mapper.WflowModelsMapper;
 import com.wflow.mapper.WflowUserAgentsMapper;
 import com.wflow.service.OrgRepositoryService;
 import com.wflow.utils.UserUtil;
-import com.wflow.workflow.UELTools;
 import com.wflow.workflow.bean.dto.NotifyDto;
 import com.wflow.workflow.bean.dto.ProcessInstanceOwnerDto;
 import com.wflow.workflow.bean.process.OrgUser;
 import com.wflow.workflow.bean.process.ProcessNode;
-import com.wflow.workflow.bean.process.ProcessStatus;
 import com.wflow.workflow.bean.process.enums.ApprovalModeEnum;
 import com.wflow.workflow.bean.process.enums.ApprovalTypeEnum;
 import com.wflow.workflow.bean.process.enums.NodeTypeEnum;
-import com.wflow.workflow.bean.process.enums.ProcessResultEnum;
 import com.wflow.workflow.bean.process.props.ApprovalProps;
 import com.wflow.workflow.bean.process.props.CcProps;
-import com.wflow.workflow.bean.process.props.RootProps;
 import com.wflow.workflow.bean.vo.*;
 import com.wflow.workflow.config.WflowGlobalVarDef;
 import com.wflow.workflow.extension.cmd.RecallToHisApprovalNodeCmd;
 import com.wflow.workflow.service.*;
-import com.wflow.workflow.service.FormService;
 import com.wflow.workflow.utils.Executor;
 import com.wflow.workflow.utils.FlowableUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.ExecutionGraphUtil;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -55,7 +55,6 @@ import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
-import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -109,12 +108,12 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
     private WflowModelHistorysMapper historysMapper;
 
     @Autowired
-    private ProcessNodeCatchService nodeCatchService;
+    private ProcessNodeCacheService nodeCatchService;
 
     @Autowired
     private WflowUserAgentsMapper agentsMapper;
 
-    //超时缓存，数据缓存20秒，用来存储审批人防止flowable高频调用
+    //超时缓存，数据缓存20秒，用来存储审批人防止flowable高频调用 //TODO 缓存优化
     private static final TimedCache<String, List<String>> taskCache = CacheUtil.newTimedCache(20000);
 
     //用来存储正在处理的节点，防止并发处理
@@ -408,6 +407,7 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
         return ccUsers;
     }
 
+//    TODO spring EL 表达式调用
     @Override
     public List<String> getNodeApprovalUsers(ExecutionEntity execution) {
         //取缓存里面的，判断之前有没有，多实例防止多次解析
@@ -799,6 +799,16 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
         }
         //存最近一个审批节点的处理结果
         var.put(WflowGlobalVarDef.PREVIOUS_AP_NODE, task.getTaskDefinitionKey() + ":" + params.getAction());
+
+        //最后一个审批人,审批通过
+        ApprovalProps props = JSON.parseObject(
+                JSON.toJSONString(runtimeService.getVariable(task.getExecutionId(), WflowGlobalVarDef.LAST_AUDIT_EVENT_TAG)),
+                ApprovalProps.class
+        );
+        final List<String> approvalUsers = getApprovalUsers(task.getExecutionId(),task.getProcessInstanceId(), props);
+        if (params.getAction() == ProcessHandlerParamsVo.Action.agree && approvalUsers.contains(task.getAssignee())) {
+            var.put(WflowGlobalVarDef.TASK_EVENT_PRE + task.getId(), ProcessHandlerParamsVo.builder().action(params.getAction()).notify(ProcessHandlerParamsVo.Notify.sync_redis_interface).build());
+        }
         taskService.complete(params.getTaskId(), var);
     }
 

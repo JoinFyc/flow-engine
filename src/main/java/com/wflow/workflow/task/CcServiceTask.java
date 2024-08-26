@@ -1,10 +1,7 @@
 package com.wflow.workflow.task;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.lang.Snowflake;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wflow.bean.entity.WflowCcTasks;
@@ -13,7 +10,7 @@ import com.wflow.bean.entity.WflowSubProcess;
 import com.wflow.mapper.WflowCcTasksMapper;
 import com.wflow.mapper.WflowModelHistorysMapper;
 import com.wflow.mapper.WflowSubProcessMapper;
-import com.wflow.utils.BeanUtil;
+import com.wflow.utils.SpringContextUtil;
 import com.wflow.workflow.bean.dto.NotifyDto;
 import com.wflow.workflow.config.WflowGlobalVarDef;
 import com.wflow.workflow.service.NotifyService;
@@ -47,11 +44,11 @@ public class CcServiceTask implements JavaDelegate {
     private static WflowModelHistorysMapper historysMapper;
 
     public CcServiceTask() {
-        ccTasksMapper = BeanUtil.getBean(WflowCcTasksMapper.class);
-        processTaskService = BeanUtil.getBean(ProcessTaskService.class);
-        notifyService = BeanUtil.getBean(NotifyService.class);
-        subProcessMapper = BeanUtil.getBean(WflowSubProcessMapper.class);
-        historysMapper = BeanUtil.getBean(WflowModelHistorysMapper.class);
+        ccTasksMapper = SpringContextUtil.getBean(WflowCcTasksMapper.class);
+        processTaskService = SpringContextUtil.getBean(ProcessTaskService.class);
+        notifyService = SpringContextUtil.getBean(NotifyService.class);
+        subProcessMapper = SpringContextUtil.getBean(WflowSubProcessMapper.class);
+        historysMapper = SpringContextUtil.getBean(WflowModelHistorysMapper.class);
     }
 
     @Override

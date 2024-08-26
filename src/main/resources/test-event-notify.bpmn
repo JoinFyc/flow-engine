@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+  <process id="wf667ced4c94ce6c3190dcf434" name="采购" isExecutable="true">
+    <startEvent id="start" name="开始"></startEvent>
+    <userTask id="root" name="发起人" flowable:assignee="${initiator}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${userTaskListener}"></flowable:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="start_root" sourceRef="start" targetRef="root"></sequenceFlow>
+    <userTask id="node_628041508279" name="办理人" flowable:assignee="${assignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${userTaskListener}"></flowable:executionListener>
+        <flowable:taskListener event="all" delegateExpression="${userTaskListener}"></flowable:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${processTaskService.getNodeApprovalUsers(execution)}" flowable:elementVariable="assignee">
+        <completionCondition>${nrOfInstances == nrOfCompletedInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="node_628005344786" name="条件1" sourceRef="node_628005336208_begin" targetRef="node_628041508279">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${uelTools.conditionCompare('node_628005344786', execution)}]]></conditionExpression>
+    </sequenceFlow>
+    <boundaryEvent id="node_628070007485-timeout" name="审批超时" attachedToRef="node_628070007485" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>PT6H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <serviceTask id="node_628070007485-timeoutTask" name="审批人超时处理" flowable:class="com.wflow.workflow.task.ApprovalTimeoutServiceTask"></serviceTask>
+    <sequenceFlow id="node_628070007485-timeout_node_628070007485-timeoutTask" sourceRef="node_628070007485-timeout" targetRef="node_628070007485-timeoutTask"></sequenceFlow>
+    <userTask id="node_628070007485" name="审批人" flowable:assignee="${assignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${userTaskListener}"></flowable:executionListener>
+        <flowable:taskListener event="all" delegateExpression="${userTaskListener}"></flowable:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${processTaskService.getNodeApprovalUsers(execution)}" flowable:elementVariable="assignee">
+        <completionCondition>${nrOfInstances == nrOfCompletedInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="node_628041508279_node_628070007485" name="提交" sourceRef="node_628041508279" targetRef="node_628070007485"></sequenceFlow>
+    <userTask id="node_628097171980" name="办理人" flowable:assignee="${assignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${userTaskListener}"></flowable:executionListener>
+        <flowable:taskListener event="all" delegateExpression="${userTaskListener}"></flowable:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${processTaskService.getNodeApprovalUsers(execution)}" flowable:elementVariable="assignee">
+        <completionCondition>${nrOfInstances == nrOfCompletedInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="node_628005341798" name="默认条件" sourceRef="node_628005336208_begin" targetRef="node_628097171980">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${uelTools.conditionCompare('node_628005341798', execution)}]]></conditionExpression>
+    </sequenceFlow>
+    <boundaryEvent id="node_628123677655-timeout" name="审批超时" attachedToRef="node_628123677655" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>PT6H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <serviceTask id="node_628123677655-timeoutTask" name="审批人超时处理" flowable:class="com.wflow.workflow.task.ApprovalTimeoutServiceTask"></serviceTask>
+    <sequenceFlow id="node_628123677655-timeout_node_628123677655-timeoutTask" sourceRef="node_628123677655-timeout" targetRef="node_628123677655-timeoutTask"></sequenceFlow>
+    <userTask id="node_628123677655" name="审批人" flowable:assignee="${assignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${userTaskListener}"></flowable:executionListener>
+        <flowable:taskListener event="all" delegateExpression="${userTaskListener}"></flowable:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${processTaskService.getNodeApprovalUsers(execution)}" flowable:elementVariable="assignee">
+        <completionCondition>${nrOfInstances == nrOfCompletedInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="node_628097171980_node_628123677655" name="提交" sourceRef="node_628097171980" targetRef="node_628123677655"></sequenceFlow>
+    <exclusiveGateway id="node_628005336208_begin" name="条件分支"></exclusiveGateway>
+    <sequenceFlow id="root_node_628005336208_begin" sourceRef="root" targetRef="node_628005336208_begin"></sequenceFlow>
+    <exclusiveGateway id="node_628005336208_end" name="条件分支聚合"></exclusiveGateway>
+    <sequenceFlow id="node_628070007485_node_628005336208_end" sourceRef="node_628070007485" targetRef="node_628005336208_end"></sequenceFlow>
+    <sequenceFlow id="node_628123677655_node_628005336208_end" sourceRef="node_628123677655" targetRef="node_628005336208_end"></sequenceFlow>
+    <boundaryEvent id="node_628169007499-timeout" name="审批超时" attachedToRef="node_628169007499" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>PT6H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <serviceTask id="node_628169007499-timeoutTask" name="审批人超时处理" flowable:class="com.wflow.workflow.task.ApprovalTimeoutServiceTask"></serviceTask>
+    <sequenceFlow id="node_628169007499-timeout_node_628169007499-timeoutTask" sourceRef="node_628169007499-timeout" targetRef="node_628169007499-timeoutTask"></sequenceFlow>
+    <userTask id="node_628169007499" name="审批人" flowable:assignee="${assignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${userTaskListener}"></flowable:executionListener>
+        <flowable:taskListener event="all" delegateExpression="${userTaskListener}"></flowable:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${processTaskService.getNodeApprovalUsers(execution)}" flowable:elementVariable="assignee">
+        <completionCondition>${nrOfInstances == nrOfCompletedInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="node_628005336208_end_node_628169007499" sourceRef="node_628005336208_end" targetRef="node_628169007499"></sequenceFlow>
+    <sequenceFlow id="node_628169007499_process-end" sourceRef="node_628169007499" targetRef="process-end"></sequenceFlow>
+    <intermediateCatchEvent id="notificationEvent" name="收到事件通知">
+            <messageEventDefinition messageRef="notificationMessage"/>
+    </intermediateCatchEvent>
+    <endEvent id="process-end" name="审批流程结束"></endEvent>
+    <endEvent id="cancel-end" name="审批流程撤消">
+      <terminateEventDefinition flowable:terminateAll="true"></terminateEventDefinition>
+    </endEvent>
+    <endEvent id="refuse-end" name="审批流程被驳回">
+      <terminateEventDefinition flowable:terminateAll="true"></terminateEventDefinition>
+    </endEvent>
+  </process>
+  <message id="notificationMessage" name="通知事件"/>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_wf667ced4c94ce6c3190dcf434">
+    <bpmndi:BPMNPlane bpmnElement="wf667ced4c94ce6c3190dcf434" id="BPMNPlane_wf667ced4c94ce6c3190dcf434">
+      <bpmndi:BPMNShape bpmnElement="node_628123677655-timeoutTask" id="BPMNShape_node_628123677655-timeoutTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="0.0" y="400.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628097171980" id="BPMNShape_node_628097171980">
+        <omgdc:Bounds height="60.0" width="100.0" x="320.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628169007499-timeoutTask" id="BPMNShape_node_628169007499-timeoutTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="0.0" y="520.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="refuse-end" id="BPMNShape_refuse-end">
+        <omgdc:Bounds height="30.0" width="30.0" x="0.0" y="730.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="30.0" width="30.0" x="0.0" y="95.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cancel-end" id="BPMNShape_cancel-end">
+        <omgdc:Bounds height="30.0" width="30.0" x="0.0" y="640.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628070007485" id="BPMNShape_node_628070007485">
+        <omgdc:Bounds height="60.0" width="100.0" x="470.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628123677655" id="BPMNShape_node_628123677655">
+        <omgdc:Bounds height="60.0" width="100.0" x="470.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628169007499-timeout" id="BPMNShape_node_628169007499-timeout">
+        <omgdc:Bounds height="30.0" width="30.0" x="775.0" y="125.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628005336208_begin" id="BPMNShape_node_628005336208_begin">
+        <omgdc:Bounds height="40.0" width="40.0" x="230.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628070007485-timeoutTask" id="BPMNShape_node_628070007485-timeoutTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="0.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="root" id="BPMNShape_root">
+        <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628070007485-timeout" id="BPMNShape_node_628070007485-timeout">
+        <omgdc:Bounds height="30.0" width="30.0" x="535.0" y="45.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628005336208_end" id="BPMNShape_node_628005336208_end">
+        <omgdc:Bounds height="40.0" width="40.0" x="620.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628169007499" id="BPMNShape_node_628169007499">
+        <omgdc:Bounds height="60.0" width="100.0" x="710.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628041508279" id="BPMNShape_node_628041508279">
+        <omgdc:Bounds height="60.0" width="100.0" x="320.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="process-end" id="BPMNShape_process-end">
+        <omgdc:Bounds height="30.0" width="30.0" x="860.0" y="95.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_628123677655-timeout" id="BPMNShape_node_628123677655-timeout">
+        <omgdc:Bounds height="30.0" width="30.0" x="535.0" y="205.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="node_628169007499-timeout_node_628169007499-timeoutTask" id="BPMNEdge_node_628169007499-timeout_node_628169007499-timeoutTask">
+        <omgdi:waypoint x="790.0" y="155.0"></omgdi:waypoint>
+        <omgdi:waypoint x="790.0" y="590.0"></omgdi:waypoint>
+        <omgdi:waypoint x="50.0" y="590.0"></omgdi:waypoint>
+        <omgdi:waypoint x="50.0" y="580.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628005344786" id="BPMNEdge_node_628005344786">
+        <omgdi:waypoint x="270.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="282.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="282.0" y="30.000000000000007"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="30.000000000000007"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628123677655_node_628005336208_end" id="BPMNEdge_node_628123677655_node_628005336208_end">
+        <omgdi:waypoint x="570.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="582.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="582.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="start_root" id="BPMNEdge_start_root">
+        <omgdi:waypoint x="30.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="80.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628005341798" id="BPMNEdge_node_628005341798">
+        <omgdi:waypoint x="270.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="282.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="282.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628070007485_node_628005336208_end" id="BPMNEdge_node_628070007485_node_628005336208_end">
+        <omgdi:waypoint x="570.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="582.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="582.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628097171980_node_628123677655" id="BPMNEdge_node_628097171980_node_628123677655">
+        <omgdi:waypoint x="420.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628169007499_process-end" id="BPMNEdge_node_628169007499_process-end">
+        <omgdi:waypoint x="810.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="860.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628123677655-timeout_node_628123677655-timeoutTask" id="BPMNEdge_node_628123677655-timeout_node_628123677655-timeoutTask">
+        <omgdi:waypoint x="550.0" y="235.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="470.0"></omgdi:waypoint>
+        <omgdi:waypoint x="50.0" y="470.0"></omgdi:waypoint>
+        <omgdi:waypoint x="50.0" y="460.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628005336208_end_node_628169007499" id="BPMNEdge_node_628005336208_end_node_628169007499">
+        <omgdi:waypoint x="660.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="710.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628041508279_node_628070007485" id="BPMNEdge_node_628041508279_node_628070007485">
+        <omgdi:waypoint x="420.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="30.000000000000007"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="30.000000000000007"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_628070007485-timeout_node_628070007485-timeoutTask" id="BPMNEdge_node_628070007485-timeout_node_628070007485-timeoutTask">
+        <omgdi:waypoint x="550.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="50.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="50.0" y="340.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="root_node_628005336208_begin" id="BPMNEdge_root_node_628005336208_begin">
+        <omgdi:waypoint x="180.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -15,10 +15,10 @@ import com.wflow.workflow.bean.process.props.ApprovalProps;
 import com.wflow.workflow.bean.vo.ProcessHandlerParamsVo;
 import com.wflow.workflow.config.WflowGlobalVarDef;
 import com.wflow.workflow.service.NotifyService;
-import com.wflow.workflow.service.ProcessNodeCatchService;
+import com.wflow.workflow.service.ProcessNodeCacheService;
 import com.wflow.workflow.service.UserDeptOrLeaderService;
-import com.wflow.workflow.utils.FlowableUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
@@ -33,8 +33,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
-import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
-import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,12 +41,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
+ * @description : 用户任务监听器
  * @author : willian fu
  * @date : 2022/8/23
  */
 @Slf4j
 @Component("userTaskListener")
-public class UserTaskListener implements TaskListener, ExecutionListener {
+public class UserTaskListener implements TaskListener{
 
     //创建一个缓存，储存审批同意的活动流程实例的状态，流程结束就释放
     //流程实例 -> (审批节点ID -> 节点内点了同意的人员)
@@ -70,16 +69,14 @@ public class UserTaskListener implements TaskListener, ExecutionListener {
     private NotifyService notifyService;
 
     @Autowired
-    private RepositoryService repositoryService;
-
-    @Autowired
     private WflowModelHistorysMapper historysMapper;
 
     @Autowired
-    private ProcessNodeCatchService nodeCatchService;
+    private ProcessNodeCacheService nodeCatchService;
 
     @Override
     public void notify(DelegateTask delegateTask) {
+        log.info("delegateTask:{},{},{}", delegateTask.getExecutionId(),delegateTask.getEventName(),delegateTask.getAssignee());
         //获取用户任务节点ID
         String nodeId = delegateTask.getTaskDefinitionKey();
         String instanceId = delegateTask.getProcessInstanceId();
@@ -154,16 +151,6 @@ public class UserTaskListener implements TaskListener, ExecutionListener {
                 }
             }
             log.info("任务[{} - {}]由[{}]完成", nodeId, delegateTask.getName(), delegateTask.getAssignee());
-        }
-    }
-
-    @Override
-    public void notify(DelegateExecution execution) {
-        if (execution.getParentId().equals(execution.getProcessInstanceId())){
-            //节点结束前执行一些操作
-            FlowElement element = execution.getCurrentFlowElement();
-            //节点完成前执行操作，必须在这里进行拦截
-            taskNodeCompleteHandler(execution.getProcessInstanceId(), execution.getProcessDefinitionId(), element.getId());
         }
     }
 
@@ -261,37 +248,5 @@ public class UserTaskListener implements TaskListener, ExecutionListener {
             }
         }
         return taskResults;
-    }
-
-    /**
-     * 处理节点离开事件，主要处理回退后再继续，是否直达回退前的节点
-     * @param instanceId 流程实例ID
-     * @param defId 流程定义ID
-     * @param nodeId 节点ID
-     */
-    public void taskNodeCompleteHandler(String instanceId, String defId, String nodeId){
-        //判断下是不是回退后执行的操作，先拿之前执行回退的那个节点的ID
-        Object bfNode = runtimeService.getVariable(instanceId, WflowGlobalVarDef.NODE_RETURN);
-        if (Objects.nonNull(bfNode)){
-            WflowModelHistorys model = historysMapper.selectOne(new LambdaQueryWrapper<WflowModelHistorys>()
-                    .select(WflowModelHistorys::getSettings).eq(WflowModelHistorys::getProcessDefId, defId));
-            JSONObject settings = JSONObject.parseObject(model.getSettings());
-            //取回退设置
-            Boolean reExecute = settings.getBoolean("reExecute");
-            if (Boolean.FALSE.equals(reExecute)){
-                //存在回退操作，并行俩节点能连接到，再执行回退，考虑并行单分支发生回退情况
-                BpmnModel bpmnModel = repositoryService.getBpmnModel(defId);
-                FlowNode sflowNode = (FlowNode) bpmnModel.getFlowElement(nodeId);
-                FlowNode tflowNode = (FlowNode) bpmnModel.getFlowElement(bfNode.toString());
-                if (ExecutionGraphUtil.isReachable(bpmnModel.getMainProcess(), sflowNode, tflowNode, new HashSet<>())){
-                    //删除回退标记
-                    runtimeService.removeVariable(instanceId, WflowGlobalVarDef.NODE_RETURN);
-                    //执行流程跳转
-                    log.info("流程[{}]回退后开始跳转[{}]继续", instanceId, tflowNode.getName());
-                    runtimeService.createChangeActivityStateBuilder().processInstanceId(instanceId)
-                            .moveActivityIdTo(nodeId, bfNode.toString()).changeState();
-                }
-            }
-        }
     }
 }

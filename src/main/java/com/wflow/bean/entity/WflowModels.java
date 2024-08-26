@@ -80,5 +80,11 @@ public class WflowModels implements Serializable {
     */
     private Date updated;
 
+    /**
+     * 业务事件Key
+     */
+    private String businessEventKey;
+
+
 
 }

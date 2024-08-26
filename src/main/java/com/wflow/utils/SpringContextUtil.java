@@ -12,7 +12,7 @@ import org.springframework.util.StringValueResolver;
  * @date : 2020/5/26
  */
 @Component
-public class BeanUtil implements ApplicationContextAware, EmbeddedValueResolverAware {
+public class SpringContextUtil implements ApplicationContextAware, EmbeddedValueResolverAware {
 
     private static ApplicationContext applicationContext;
 
@@ -20,7 +20,7 @@ public class BeanUtil implements ApplicationContextAware, EmbeddedValueResolverA
 
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
-        if (BeanUtil.applicationContext == null){
+        if (SpringContextUtil.applicationContext == null){
             applicationContext = context;
         }
     }

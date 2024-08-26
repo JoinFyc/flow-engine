@@ -74,6 +74,9 @@ public class ProcessModelServiceImpl implements ProcessModelService {
     @Override
     @Transactional
     public String saveProcess(WflowModelHistorys models) {
+
+        //TODO business_event_key校验
+
         //提取摘要字段，进行保存
         models.setFormAbstracts(JSON.toJSONString(loadFormAbstracts(models.getFormItems())));
         if (ObjectUtil.isNull(models.getFormId())) {
@@ -86,6 +89,8 @@ public class ProcessModelServiceImpl implements ProcessModelService {
             wflowModels.setIsStop(false);
             wflowModels.setUpdated(new Date());
             wflowModels.setSort(0);
+            //TODO 模型表&模型历史表 --add column business_event_key
+            //TODO 新增业务事件表&事件规则表&事件接口表&事件接口字段表....
             modelHistorysMapper.insert(models);
             //初始的流程在部署表也存一份，用来查询
             modelsMapper.insert(wflowModels);
@@ -138,6 +143,8 @@ public class ProcessModelServiceImpl implements ProcessModelService {
             throw new BusinessException("不存在该表单");
         }
         ProcessNode<?> processNode = JSONObject.parseObject(wflowModels.getProcess(), ProcessNode.class);
+        //TODO 流程转换器&流程校验器，单例模型
+        //构建流程模型，并验证
         BpmnModel bpmnModel = new WFlowToBpmnCreator().loadBpmnFlowXmlByProcess(wflowModels.getFormId(), wflowModels.getFormName(), processNode, false);
         ProcessValidatorFactory processValidatorFactory = new ProcessValidatorFactory();
         ProcessValidator defaultProcessValidator = processValidatorFactory.createDefaultProcessValidator();
@@ -150,12 +157,12 @@ public class ProcessModelServiceImpl implements ProcessModelService {
                     .collect(Collectors.joining(",")));
         }
         String xmlString = new String(new BpmnXMLConverter().convertToXML(bpmnModel));
-        //  流程部署
-        log.debug("流程生成bpmn-xml为：{}", xmlString);
+        //  流程部署 TODO 部署校验：例如条件网关设置错误，也能通过部署。但是流程实例生成会报错。排查问题，全部打印到日志
+        log.info("流程生成bpmn-xml为：{}", xmlString);
         Deployment deploy = repositoryService.createDeployment()
                 .key(code)
                 .name(wflowModels.getFormName())
-                .tenantId("default")
+                .tenantId("default") //TODO 租户改造
                 .category(String.valueOf(wflowModels.getGroupId()))
                 .addString(wflowModels.getFormId() + ".bpmn", xmlString)
                 .deploy();
@@ -163,7 +170,7 @@ public class ProcessModelServiceImpl implements ProcessModelService {
         WflowModels models = new WflowModels();
         BeanUtil.copyProperties(wflowModels, models);
         models.setProcessDefId(processDefinition.getId());
-        models.setVersion(processDefinition.getVersion());
+        models.setVersion(processDefinition.getVersion()); //部署的版本号，流程定义的版本号: v=v+1
         models.setIsDelete(false);
         models.setIsStop(false);
         models.setDeployId(deploy.getId());

@@ -10,7 +10,7 @@ import java.util.Map;
  * @author : willian fu
  * @date : 2022/8/24
  */
-public interface ProcessNodeCatchService {
+public interface ProcessNodeCacheService {
 
     ProcessNode<?> getProcessNodeById(String code, String nodeId);
 

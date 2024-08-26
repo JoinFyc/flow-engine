@@ -1,110 +1,110 @@
-#配置内置Tomcat端口
-server:
-  port: 10000
-spring:
-  application:
-    name: wflow
-  http:
-    encoding:
-      charset: UTF-8
-      force: true
-      enabled: true
-  devtools:
-    restart:
-      enabled: true
-    livereload:
-      enabled: true
-  #配置数据源
-  datasource:
-    url: jdbc:mysql://localhost:3306/wflow_pro?useSSL=false&useUnicode=true&characterEncoding=utf8
-    driverClassName: com.mysql.jdbc.Driver
-    username: wflow
-    password: wflow
-
-  jackson:
-    #字段为null时不返回该字段
-    #default-property-inclusion: non_null
-    time-zone: GMT+8
-    date-format: yyyy-MM-dd HH:mm:ss
-
-  servlet:
-    multipart:
-      #单个文件大小
-      max-file-size: 100MB
-      #设置总共上传的文件大小
-      max-request-size: 500MB
-
-  #邮件发送配置
-  mail:
-    host: smtp.qq.com
-    username: smartiots@qq.com
-    password: fnrruelrccqaeaef--
-    protocol: smtps
-    default-encoding: UTF-8
-    properties:
-      default-encoding: utf-8
-      mail:
-        smtp:
-          port: 465
-          auth: true
-          starttls:
-            enable: true
-            required: true
-
-management:
-  health:
-    mail: #忽略邮件健康检查
-      enabled: false
-
-#日志配置
-logging:
-  level:
-    root: info
-
-#mybatis配置
-mybatis-plus:
-  global-config:
-    banner: false
-  mapper-locations: classpath:mybatis/mapper/*.xml
-  type-aliases-package: com.wflow
-  configuration:
-    map-underscore-to-camel-case: true
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
-flowable:
-  #激活异步任务，审批超时事件需要
-  async-executor-activate: true
-  rest-api-enabled: false
-  #关闭流程定义缓存，使用LRU，根据自己项目情况设置
-  process:
-    definition-cache-limit: 40960
-  idm:
-    enabled: false
-  cmmn:
-    enabled: false
-  dmn:
-    enabled: false
-  form:
-    enabled: false
-  app:
-    enabled: false
-
-wflow:
-  file:
-    max-size: 20 #最大文件上传大小，MB
-
-sa-token:
-  # token 名称 (同时也是cookie名称)
-  token-name: wflowToken
-  # token 有效期，单位s 默认30天, -1代表永不过期
-  timeout: 172800
-  # token 临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
-  activity-timeout: -1
-  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
-  is-concurrent: true
-  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
-  is-share: false
-  # token风格
-  token-style: uuid
-  # 是否输出操作日志
-  is-log: false
+##配置内置Tomcat端口
+#server:
+#  port: 10000
+#spring:
+#  application:
+#    name: wflow
+#  http:
+#    encoding:
+#      charset: UTF-8
+#      force: true
+#      enabled: true
+#  devtools:
+#    restart:
+#      enabled: true
+#    livereload:
+#      enabled: true
+#  #配置数据源
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/wflow_pro?useSSL=false&useUnicode=true&characterEncoding=utf8
+#    driverClassName: com.mysql.jdbc.Driver
+#    username: wflow
+#    password: wflow
+#
+#  jackson:
+#    #字段为null时不返回该字段
+#    #default-property-inclusion: non_null
+#    time-zone: GMT+8
+#    date-format: yyyy-MM-dd HH:mm:ss
+#
+#  servlet:
+#    multipart:
+#      #单个文件大小
+#      max-file-size: 100MB
+#      #设置总共上传的文件大小
+#      max-request-size: 500MB
+#
+#  #邮件发送配置
+#  mail:
+#    host: smtp.qq.com
+#    username: smartiots@qq.com
+#    password: fnrruelrccqaeaef--
+#    protocol: smtps
+#    default-encoding: UTF-8
+#    properties:
+#      default-encoding: utf-8
+#      mail:
+#        smtp:
+#          port: 465
+#          auth: true
+#          starttls:
+#            enable: true
+#            required: true
+#
+#management:
+#  health:
+#    mail: #忽略邮件健康检查
+#      enabled: false
+#
+##日志配置
+#logging:
+#  level:
+#    root: info
+#
+##mybatis配置
+#mybatis-plus:
+#  global-config:
+#    banner: false
+#  mapper-locations: classpath:mybatis/mapper/*.xml
+#  type-aliases-package: com.wflow
+#  configuration:
+#    map-underscore-to-camel-case: true
+#    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#
+#flowable:
+#  #激活异步任务，审批超时事件需要
+#  async-executor-activate: true
+#  rest-api-enabled: false
+#  #关闭流程定义缓存，使用LRU，根据自己项目情况设置
+#  process:
+#    definition-cache-limit: 40960
+#  idm:
+#    enabled: false
+#  cmmn:
+#    enabled: false
+#  dmn:
+#    enabled: false
+#  form:
+#    enabled: false
+#  app:
+#    enabled: false
+#
+#wflow:
+#  file:
+#    max-size: 20 #最大文件上传大小，MB
+#
+#sa-token:
+#  # token 名称 (同时也是cookie名称)
+#  token-name: wflowToken
+#  # token 有效期，单位s 默认30天, -1代表永不过期
+#  timeout: 172800
+#  # token 临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
+#  activity-timeout: -1
+#  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+#  is-concurrent: true
+#  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+#  is-share: false
+#  # token风格
+#  token-style: uuid
+#  # 是否输出操作日志
+#  is-log: false
