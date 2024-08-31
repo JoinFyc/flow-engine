@@ -4,22 +4,46 @@ server:
 spring:
   application:
     name: wflow
-#  http:
+  datasource:
+  #配置数据源
+    dynamic:
+      #设置默认的数据源或者数据源组,默认值即为master
+      primary: flow
+      #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
+      strict: false
+      datasource:
+        flow:
+          url: jdbc:mysql://cuslter-pm-2023.rwlb.zhangbei.rds.aliyuncs.com:3306/work_flow?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&tinyInt1isBit=false
+          username: fanxin_pm_master
+          password: Fanxin@Sbz123!@#
+          driverClassName: com.mysql.jdbc.Driver
+        slave:
+          url: jdbc:mysql://cuslter-pm-2023.rwlb.zhangbei.rds.aliyuncs.com:3306/hr?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&tinyInt1isBit=false
+          username: fanxin_pm_master
+          password: Fanxin@Sbz123!@#
+          driverClassName: com.mysql.jdbc.Driver
+
+  #  http:
 #    encoding:
 #      charset: UTF-8
 #      force: true
 #      enabled: true
-  devtools:
-    restart:
-      enabled: true
-    livereload:
-      enabled: true
-  #配置数据源
-  datasource:
-    url: jdbc:mysql://cuslter-pm-2023.rwlb.zhangbei.rds.aliyuncs.com:3306/work_flow?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&tinyInt1isBit=false
-    driverClassName: com.mysql.jdbc.Driver
-    username: fanxin_pm_master
-    password: Fanxin@Sbz123!@#
+#  cloud:
+#    nacos:
+#      discovery:
+#        # 配置所属命名空间的id，我们配置名称为dev的id，在命名空间列表查看id的值
+#        namespace: sofa-rpc
+#        # 配置所属分组
+#        group: DEFAULT_GROUP
+#        # nacos服务器地址
+#        server-addr: bng.nacos.com
+#  config:
+#    activate:
+#      on-profile:
+#        - ${spring.profiles.active}
+#    import:
+#      - optional:nacos:application-${spring.profiles.active}.yml
+#      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yml
   jackson:
     #字段为null时不返回该字段
     #default-property-inclusion: non_null
@@ -75,7 +99,7 @@ mybatis-plus:
   type-aliases-package: com.wflow
   configuration:
     map-underscore-to-camel-case: true
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 flowable:
   #激活异步任务，审批超时事件需要
@@ -90,9 +114,6 @@ flowable:
   cmmn:
     enabled: false
   dmn:
-    enabled: false
-  #表单引擎
-  form:
     enabled: false
   app:
     enabled: false

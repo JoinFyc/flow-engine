@@ -28,6 +28,7 @@ import com.wflow.workflow.bean.vo.FormAbstractsVo;
 import com.wflow.workflow.config.WflowGlobalVarDef;
 import com.wflow.workflow.service.ProcessModelService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.HistoryService;
@@ -281,6 +282,9 @@ public class ProcessModelServiceImpl implements ProcessModelService {
 
     private List<FormAbstractsVo> loadFormAbstracts(String formItems){
         ArrayList<FormAbstractsVo> abstractsVos = new ArrayList<>();
+        if (StringUtils.isNotBlank(formItems)) {
+            return abstractsVos;
+        }
         JSONArray.parseArray(formItems, JSONObject.class).forEach(item -> {
             loadFormItems(abstractsVos, item);
         });

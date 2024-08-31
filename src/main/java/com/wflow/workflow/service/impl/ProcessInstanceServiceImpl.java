@@ -8,6 +8,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wflow.bean.FlowProcessContext;
 import com.wflow.bean.do_.UserDeptDo;
 import com.wflow.bean.do_.UserDo;
 import com.wflow.bean.entity.WflowCcTasks;
@@ -600,6 +601,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                             ist.setTaskName(StrUtil.join("、", tasks.stream().map(TaskInfo::getName).collect(Collectors.toSet())));
                         });
                     });
+        }
+        final FlowProcessContext flowProcessContext = FlowProcessContext.getFlowProcessContext();
+        if (flowProcessContext != null && flowProcessContext.getFieldTag() == Boolean.TRUE) {
+            return instanceVos;
         }
         if (CollectionUtil.isNotEmpty(staterUsers)) {
             Map<String, OrgUser> userMap = userDeptOrLeaderService.getUserMapByIds(staterUsers);

@@ -7,6 +7,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.wflow.bean.FlowProcessContext;
 import com.wflow.bean.entity.WflowFormData;
 import com.wflow.bean.entity.WflowFormRecord;
 import com.wflow.bean.entity.WflowModelHistorys;
@@ -78,6 +79,10 @@ public abstract class AbstractFormServiceImpl implements FormService {
             return Collections.emptyMap();
         }
         //流程定义ID -> 表单摘要配置信息
+        FlowProcessContext flowProcessContext = FlowProcessContext.getFlowProcessContext();
+        if (flowProcessContext != null && flowProcessContext.getFieldTag() == Boolean.TRUE) {
+            return Collections.emptyMap();
+        }
         Map<String, List<FormAbstractsVo>> defMap = modelsMapper.selectList(new LambdaQueryWrapper<WflowModelHistorys>()
                         .select(WflowModelHistorys::getFormAbstracts, WflowModelHistorys::getProcessDefId)
                         .in(WflowModelHistorys::getProcessDefId, new HashSet<>(instances.values())))
