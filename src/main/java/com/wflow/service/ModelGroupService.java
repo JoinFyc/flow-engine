@@ -3,6 +3,7 @@ package com.wflow.service;
 import com.wflow.bean.entity.WflowModelGroups;
 import com.wflow.bean.entity.WflowModels;
 import com.wflow.bean.vo.ModelGroupVo;
+import com.wflow.bean.vo.remote.req.FlowModelGroupRequest;
 
 import java.util.List;
 
@@ -14,6 +15,8 @@ public interface ModelGroupService {
 
 
     List<ModelGroupVo> getGroupModels(String userId, String modelName);
+
+    List<ModelGroupVo> getGroupModels(String modelName);
 
     /**
      * 查询表单组
@@ -63,11 +66,23 @@ public interface ModelGroupService {
     void createModelGroup(String name);
 
     /**
+     * 新增表单分组
+     * @param request
+     */
+    void createModelGroup(FlowModelGroupRequest request);
+
+    /**
      * 删除分组
      *
      * @param id 分组ID
      */
     void deleteModelGroup(Long id);
+
+    /**
+     * 删除分组,存在模型就不允许删除
+     * @param id
+     */
+    void deleteByGroupId(Long id);
 
     /**
      * 分组流程排序

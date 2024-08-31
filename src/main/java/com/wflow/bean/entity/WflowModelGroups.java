@@ -36,6 +36,18 @@ public class WflowModelGroups implements Serializable {
     * 更新时间
     */
     private Date updated;
+    /**
+     * 创建人
+     */
+    private String createUser;
+    /**
+     * 状态
+     */
+    private Integer status;
+    /**
+    * 创建时间
+    */
+    private Date created;
 
 
 }

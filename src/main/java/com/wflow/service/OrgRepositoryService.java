@@ -108,6 +108,8 @@ public interface OrgRepositoryService {
      */
     List<UserDeptDo> getSysAllUserDepts();
 
+    List<OrgTreeVo> getDeptByCoNo(Long coNo);
+
     /**
      * 根据ID查询父部门的所有直属子部门
      * @param parentId 父部门ID

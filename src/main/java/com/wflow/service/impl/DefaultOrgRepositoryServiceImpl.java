@@ -1,8 +1,7 @@
 package com.wflow.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.wflow.bean.FlowProcessContext;
 import com.wflow.bean.do_.DeptDo;
 import com.wflow.bean.do_.RoleDo;
 import com.wflow.bean.do_.UserDeptDo;
@@ -11,6 +10,7 @@ import com.wflow.bean.entity.*;
 import com.wflow.bean.vo.ModelGroupVo;
 import com.wflow.bean.vo.OrgTreeVo;
 import com.wflow.bean.vo.UserVo;
+import com.wflow.exception.BusinessException;
 import com.wflow.mapper.*;
 import com.wflow.service.OrgRepositoryService;
 import org.springframework.beans.BeanUtils;
@@ -46,6 +46,12 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Autowired
     private WflowModelPermsMapper modelPermsMapper;
 
+    @Autowired
+    private HrmStaffInfoMapper hrmStaffInfoMapper;
+
+    @Autowired
+    private OrgDeptMapper orgDeptMapper;
+
     @Override
     public List<ModelGroupVo.Form> getModelsByPerm(String userId) {
         return modelPermsMapper.selectByPerms(userId);
@@ -53,24 +59,38 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
 
     @Override
     public UserDo getUserById(String userId) {
-        WflowUsers wflowUsers = usersMapper.selectById(userId);
-        if (Objects.nonNull(wflowUsers)){
-            UserDo userDo = new UserDo();
-            BeanUtils.copyProperties(wflowUsers, userDo);
-            return userDo;
+        if(FlowProcessContext.getFlowProcessContext() == null) {
+            WflowUsers wflowUsers = usersMapper.selectById(userId);
+            if (Objects.nonNull(wflowUsers)){
+                UserDo userDo = new UserDo();
+                BeanUtils.copyProperties(wflowUsers, userDo);
+                return userDo;
+            }
         }
-        return null;
+        final HrmStaffInfo hrmStaffInfo = hrmStaffInfoMapper.selectById(Long.valueOf(userId));
+        UserDo userDo = new UserDo();
+        userDo.setUserId(userId);
+        userDo.setUserName(hrmStaffInfo.getUserName());
+        userDo.setAvatar(hrmStaffInfo.getPersonalPhoto());
+        return userDo;
     }
 
     @Override
     public List<OrgTreeVo> selectUsersByPy(String py) {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.getFlowProcessContext();
+        if(flowProcessContext != null && flowProcessContext.getFieldTag()) {
+           return hrmStaffInfoMapper.selectUsersLikeName(py.concat("%")).stream()
+                    .peek(u -> u.setType("user")).collect(Collectors.toList());
+        }
         return usersMapper.selectUsersByPy(py).stream()
                 .peek(u -> u.setType("user")).collect(Collectors.toList());
     }
 
     @Override
     public List<OrgTreeVo> selectUsersByDept(String deptId) {
-        List<OrgTreeVo> orgTreeVos = usersMapper.selectUsersByDept(deptId);
+        List<OrgTreeVo> orgTreeVos = FlowProcessContext.getFlowProcessContext() == null ?
+                usersMapper.selectUsersByDept(deptId) :
+                hrmStaffInfoMapper.selectUsersByDept(Long.valueOf(deptId));
         orgTreeVos.forEach(v -> v.setType("user"));
         return orgTreeVos;
     }
@@ -78,9 +98,12 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Override
     public List<UserDo> getUsersBatch(Collection<String> userIds) {
         try {
-            return usersMapper.selectBatchIds(userIds).stream()
+            return FlowProcessContext.getFlowProcessContext() == null ? usersMapper.selectBatchIds(userIds).stream()
                     .map(u -> new UserDo(u.getUserId(), u.getUserName(), u.getAvatar()))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()) :
+                    hrmStaffInfoMapper.selectBatchIds(userIds).stream()
+                            .map(u -> new UserDo(u.getAutoNo().toString(), u.getUserName(), u.getPersonalPhoto()))
+                            .collect(Collectors.toList());
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -89,9 +112,12 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Override
     public List<DeptDo> getDeptBatch(Collection<String> deptIds) {
         try {
-            return departsMapper.selectBatchIds(deptIds).stream()
+            return FlowProcessContext.getFlowProcessContext() == null ? departsMapper.selectBatchIds(deptIds).stream()
                     .map(u -> new DeptDo(u.getId(), u.getDeptName(), u.getLeader(), u.getParentId()))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()) :
+                    orgDeptMapper.selectBatchIds(deptIds).stream()
+                            .map(u -> new DeptDo(u.getAutoNo().toString(), u.getName(), u.getResponsibleId().toString(), u.getParentDeptId().toString()))
+                            .collect(Collectors.toList());
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -100,12 +126,17 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Override
     public Set<String> getUsersByDepts(Collection<String> deptIds) {
         try {
-            return userDepartmentsMapper.selectList(
+            return FlowProcessContext.getFlowProcessContext() == null ? userDepartmentsMapper.selectList(
                     new LambdaQueryWrapper<WflowUserDepartments>()
                             .select(WflowUserDepartments::getUserId)
                             .in(WflowUserDepartments::getDeptId, deptIds))
                     .stream().map(WflowUserDepartments::getUserId)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toSet()) :
+                    hrmStaffInfoMapper.selectList(
+                            new LambdaQueryWrapper<HrmStaffInfo>()
+                                    .select(HrmStaffInfo::getAutoNo)
+                                    .in(HrmStaffInfo::getDeptNo, deptIds.stream().map(Long::parseLong).collect(Collectors.toSet()))
+                    ).stream().map(s -> s.getAutoNo().toString()).collect(Collectors.toSet());
         } catch (Exception e) {
             return Collections.emptySet();
         }
@@ -113,10 +144,21 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
 
     @Override
     public DeptDo getDeptById(String deptId) {
-        WflowDepartments departments = departsMapper.selectById(deptId);
-        if (Objects.nonNull(departments)){
+        if(FlowProcessContext.getFlowProcessContext() == null) {
+            WflowDepartments departments = departsMapper.selectById(deptId);
+            if (Objects.nonNull(departments)) {
+                DeptDo deptDo = new DeptDo();
+                BeanUtils.copyProperties(departments, deptDo);
+                return deptDo;
+            }
+        }
+        final OrgDept orgDept = orgDeptMapper.selectById(Long.valueOf(deptId));
+        if (Objects.nonNull(orgDept)) {
             DeptDo deptDo = new DeptDo();
-            BeanUtils.copyProperties(departments, deptDo);
+            deptDo.setId(orgDept.getAutoNo().toString());
+            deptDo.setDeptName(orgDept.getName());
+            deptDo.setLeader(orgDept.getResponsibleId().toString());
+            deptDo.setParentId(orgDept.getParentDeptId().toString());
             return deptDo;
         }
         return null;
@@ -125,9 +167,12 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Override
     public List<DeptDo> getSysAllDepts() {
         try {
-            return departsMapper.selectList(null).stream()
+            return FlowProcessContext.getFlowProcessContext() == null? departsMapper.selectList(null).stream()
                     .map(d -> new DeptDo(d.getId(), d.getDeptName(), d.getLeader(), d.getParentId()))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()) :
+                    orgDeptMapper.selectList(null).stream()
+                            .map(d -> new DeptDo(d.getAutoNo().toString(), d.getName(), d.getResponsibleId().toString(), d.getParentDeptId().toString()))
+                            .collect(Collectors.toList())  ;
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -136,23 +181,46 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Override
     public List<UserDeptDo> getSysAllUserDepts() {
         try {
-            return userDepartmentsMapper.selectList(null).stream()
+            return FlowProcessContext.getFlowProcessContext() == null? userDepartmentsMapper.selectList(null).stream()
                     .map(d -> new UserDeptDo(d.getUserId(), d.getDeptId()))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()) :
+                    hrmStaffInfoMapper.selectList(null).stream()
+                            .map(d -> new UserDeptDo(d.getAutoNo().toString(), d.getDeptNo().toString()))
+                            .collect(Collectors.toList());
         } catch (Exception e) {
             return Collections.emptyList();
         }
     }
 
     @Override
+    public List<OrgTreeVo> getDeptByCoNo(Long coNo) {
+        return  orgDeptMapper.selectList(new LambdaQueryWrapper<OrgDept>()
+                                .select(OrgDept::getAutoNo, OrgDept::getName)
+                                .eq(OrgDept::getCoNo, coNo))
+                        .stream().map(v -> OrgTreeVo.builder().id(v.getAutoNo().toString())
+                                .name(v.getName())
+                                .type("dept").build())
+                        .collect(Collectors.toList());
+    }
+
+    @Override
     public List<OrgTreeVo> getSubDeptById(String parentId) {
-        return departsMapper.selectList(new LambdaQueryWrapper<WflowDepartments>()
+        return FlowProcessContext.getFlowProcessContext() == null?
+                departsMapper.selectList(new LambdaQueryWrapper<WflowDepartments>()
                 .select(WflowDepartments::getId, WflowDepartments::getDeptName)
                 .eq(WflowDepartments::getParentId, parentId))
                 .stream().map(v -> OrgTreeVo.builder().id(v.getId())
                         .name(v.getDeptName())
                         .type("dept").build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                :
+                orgDeptMapper.selectList(new LambdaQueryWrapper<OrgDept>()
+                                .select(OrgDept::getAutoNo, OrgDept::getName)
+                                .eq(OrgDept::getParentDeptId, parentId))
+                        .stream().map(v -> OrgTreeVo.builder().id(v.getAutoNo().toString())
+                                .name(v.getName())
+                                .type("dept").build())
+                        .collect(Collectors.toList());
     }
 
     @Override
@@ -168,11 +236,19 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
      * @param subDepts 所有子部门缓存
      */
     private void loadSubDept(String parentId, List<String> subDepts){
-        List<WflowDepartments> departments = departsMapper.selectList(
-                new LambdaQueryWrapper<WflowDepartments>()
-                .eq(WflowDepartments::getParentId, parentId));
-        subDepts.addAll(departments.stream().map(WflowDepartments::getId).collect(Collectors.toList()));
-        departments.forEach(d -> loadSubDept(d.getId(), subDepts));
+        if(FlowProcessContext.getFlowProcessContext() == null) {
+            List<WflowDepartments> departments = departsMapper.selectList(
+                    new LambdaQueryWrapper<WflowDepartments>()
+                    .eq(WflowDepartments::getParentId, parentId));
+            subDepts.addAll(departments.stream().map(WflowDepartments::getId).collect(Collectors.toList()));
+            departments.forEach(d -> loadSubDept(d.getId(), subDepts));
+        }else {
+            List<OrgDept> departments = orgDeptMapper.selectList(
+                    new LambdaQueryWrapper<OrgDept>()
+                            .eq(OrgDept::getParentDeptId, Long.valueOf(parentId)));
+            subDepts.addAll(departments.stream().map(d -> d.getAutoNo().toString()).collect(Collectors.toList()));
+            departments.forEach(d -> loadSubDept(d.getAutoNo().toString(), subDepts));
+        }
     }
 
     @Override
@@ -206,24 +282,59 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
 
     @Override
     public UserVo getUserDetail(String userId) {
-        WflowUsers user = usersMapper.selectById(userId);
-        List<DeptDo> depts = getDeptsByUser(userId);
-        List<WflowRoles> roles = rolesMapper.getRolesByUser(userId);
-        return UserVo.builder()
+        if (FlowProcessContext.getFlowProcessContext() == null) {
+            WflowUsers user = usersMapper.selectById(userId);
+            List<DeptDo> depts = getDeptsByUser(userId);
+            List<WflowRoles> roles = rolesMapper.getRolesByUser(userId);
+            return  UserVo.builder()
+                    .userId(userId)
+                    .username(user.getUserName())
+                    .sex(user.getSex())
+                    .avatar(user.getAvatar())
+                    .entryDate(user.getEntryDate())
+                    .leaveDate(user.getLeaveDate())
+                    .positions(Collections.emptyList())
+                    .depts(depts.stream().map(DeptDo::getDeptName).collect(Collectors.toList()))
+                    .roles(roles.stream().map(WflowRoles::getRoleName).collect(Collectors.toList()))
+                    .build();
+        }
+        final HrmStaffInfo hrmStaffInfo = hrmStaffInfoMapper.selectById(Long.valueOf(userId));
+        if(hrmStaffInfo==null){
+            throw new BusinessException("员工信息不存在");
+        }
+        final List<DeptDo> depts = getDeptsByUser(userId);
+        return  UserVo.builder()
                 .userId(userId)
-                .username(user.getUserName())
-                .sex(user.getSex())
-                .avatar(user.getAvatar())
-                .entryDate(user.getEntryDate())
-                .leaveDate(user.getLeaveDate())
+                .username(hrmStaffInfo.getUserName())
+                .sex(hrmStaffInfo.getGender() == 0)
+                .avatar(hrmStaffInfo.getPersonalPhoto())
+//                .entryDate(hrmStaffInfo.getEntryDate())
+//                .leaveDate(hrmStaffInfo.getLeaveDate())
                 .positions(Collections.emptyList())
                 .depts(depts.stream().map(DeptDo::getDeptName).collect(Collectors.toList()))
-                .roles(roles.stream().map(WflowRoles::getRoleName).collect(Collectors.toList()))
+//                .roles(roles.stream().map(WflowRoles::getRoleName).collect(Collectors.toList()))
                 .build();
+
     }
 
     @Override
     public List<DeptDo> getDeptsByUser(String userId) {
-        return userDepartmentsMapper.getUserDepts(userId);
+        if(FlowProcessContext.getFlowProcessContext()==null){
+            return userDepartmentsMapper.getUserDepts(userId);
+        }
+        final HrmStaffInfo hrmStaffInfo = hrmStaffInfoMapper.selectById(Long.valueOf(userId));
+        if(hrmStaffInfo==null){
+            throw new BusinessException("员工信息不存在");
+        }
+        return orgDeptMapper.selectList(
+                new LambdaQueryWrapper<OrgDept>()
+                        .select(OrgDept::getAutoNo,OrgDept::getName)
+                        .eq(OrgDept::getAutoNo,hrmStaffInfo.getAutoNo()
+                )).stream().map(d ->
+                    DeptDo.builder()
+                        .id(d.getAutoNo().toString())
+                        .deptName(d.getName())
+                        .build()
+        ).collect(Collectors.toList());
     }
 }

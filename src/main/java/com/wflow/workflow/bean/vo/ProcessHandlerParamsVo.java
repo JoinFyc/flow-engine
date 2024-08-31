@@ -18,6 +18,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProcessHandlerParamsVo {
+    private String userId;
     //实例ID
     private String instanceId;
     //任务ID

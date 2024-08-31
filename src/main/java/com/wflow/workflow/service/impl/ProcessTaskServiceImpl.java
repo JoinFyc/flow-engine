@@ -805,9 +805,11 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
                 JSON.toJSONString(runtimeService.getVariable(task.getExecutionId(), WflowGlobalVarDef.LAST_AUDIT_EVENT_TAG)),
                 ApprovalProps.class
         );
-        final List<String> approvalUsers = getApprovalUsers(task.getExecutionId(),task.getProcessInstanceId(), props);
-        if (params.getAction() == ProcessHandlerParamsVo.Action.agree && approvalUsers.contains(task.getAssignee())) {
-            var.put(WflowGlobalVarDef.TASK_EVENT_PRE + task.getId(), ProcessHandlerParamsVo.builder().action(params.getAction()).notify(ProcessHandlerParamsVo.Notify.sync_redis_interface).build());
+        if (props != null) {
+            final List<String> approvalUsers = getApprovalUsers(task.getExecutionId(),task.getProcessInstanceId(), props);
+            if (params.getAction() == ProcessHandlerParamsVo.Action.agree && approvalUsers.contains(task.getAssignee())) {
+                var.put(WflowGlobalVarDef.TASK_EVENT_PRE + task.getId(), ProcessHandlerParamsVo.builder().action(params.getAction()).notify(ProcessHandlerParamsVo.Notify.sync_redis_interface).build());
+            }
         }
         taskService.complete(params.getTaskId(), var);
     }
