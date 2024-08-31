@@ -1,7 +1,7 @@
 package com.wflow.workflow.utils;
 
 import cn.hutool.core.util.StrUtil;
-import com.wflow.utils.BeanUtil;
+import com.wflow.utils.SpringContextUtil;
 import com.wflow.workflow.bean.dto.ProcessInstanceOwnerDto;
 import com.wflow.workflow.config.WflowGlobalVarDef;
 import org.flowable.bpmn.model.Process;
@@ -11,9 +11,6 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.service.HistoricVariableService;
-import org.flowable.variable.service.VariableService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,7 +33,7 @@ public class FlowableUtils {
      * @return 实例ID -> 流程变量值
      */
     public static Map<String, Object> getProcessVars(Collection<String> instanceIds, String varName) {
-        HistoryService historyService = BeanUtil.getBean(HistoryService.class);
+        HistoryService historyService = SpringContextUtil.getBean(HistoryService.class);
         return historyService.createNativeHistoricVariableInstanceQuery()
                 .sql(StrUtil.builder().append("select * from ACT_HI_VARINST where PROC_INST_ID_ IN ('")
                         .append(String.join("','", instanceIds)).append("')")
@@ -53,7 +50,7 @@ public class FlowableUtils {
      * @return 实例ID+变量名 -> 流程变量值
      */
     public static Map<String, Object> getProcessVars(Collection<String> instanceIds, Collection<String> varNames) {
-        HistoryService historyService = BeanUtil.getBean(HistoryService.class);
+        HistoryService historyService = SpringContextUtil.getBean(HistoryService.class);
         return historyService.createNativeHistoricVariableInstanceQuery()
                 .sql(StrUtil.builder().append("select * from ACT_HI_VARINST where PROC_INST_ID_ IN ('")
                         .append(String.join("','", instanceIds)).append("')")
@@ -72,13 +69,13 @@ public class FlowableUtils {
      */
     public static String getOwnerDept(String instanceId, boolean runtime) {
         if (runtime){
-            RuntimeService runtimeService = BeanUtil.getBean(RuntimeService.class);
+            RuntimeService runtimeService = SpringContextUtil.getBean(RuntimeService.class);
             ProcessInstanceOwnerDto owner = (ProcessInstanceOwnerDto) runtimeService.getVariable(instanceId, WflowGlobalVarDef.OWNER);
             return Optional.ofNullable(owner)
                     .orElseGet(ProcessInstanceOwnerDto::new)
                     .getOwnerDeptId();
         }
-        HistoryService historyService = BeanUtil.getBean(HistoryService.class);
+        HistoryService historyService = SpringContextUtil.getBean(HistoryService.class);
         HistoricVariableInstance result = historyService.createHistoricVariableInstanceQuery()
                 .processInstanceId(instanceId).variableName(WflowGlobalVarDef.OWNER).singleResult();
         if (Objects.nonNull(result)) {

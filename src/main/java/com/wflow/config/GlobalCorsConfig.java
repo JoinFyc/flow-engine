@@ -15,12 +15,12 @@ import java.io.IOException;
 import java.util.Collections;
 
 /**
- * @author : willian fu
- * @version : 1.0
- * 设置跨域
+ * @author JoinFyc
+ * @description 跨域设置
+ * @date 2024-08-05
  */
 @Configuration
-public class GlobalCorsConfig {//implements Filter {// extends WebMvcConfigurerAdapter {
+public class GlobalCorsConfig {
 
     @Value("${web.domain}")
     private String webDomain;
@@ -47,28 +47,4 @@ public class GlobalCorsConfig {//implements Filter {// extends WebMvcConfigurerA
         return filterRegistrationBean;
     }
 
-    //@Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletResponse res = (HttpServletResponse) response;
-        res.addHeader("Access-Control-Allow-Credentials", "true");
-        res.addHeader("Access-Control-Allow-Origin", "*");
-        res.addHeader("Access-Control-Allow-Headers", "*");
-        //res.addHeader("Access-Control-Allow-Methods", "*");
-        res.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS, PATCH, HEAD");
-        if (((HttpServletRequest) request).getMethod().equals("OPTIONS")) {
-            response.getWriter().println("ok");
-            return;
-        }
-        chain.doFilter(request, response);
-    }
-
-    /*@Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowCredentials(true)
-                .allowedMethods("*")
-                .allowedOrigins("*")
-                .allowedHeaders("*")
-                .maxAge(3600 * 5);
-    }*/
 }

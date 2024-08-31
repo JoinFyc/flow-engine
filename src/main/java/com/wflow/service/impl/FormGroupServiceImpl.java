@@ -18,7 +18,7 @@ import com.wflow.workflow.bean.process.form.Form;
 import com.wflow.workflow.bean.process.props.RootProps;
 import com.wflow.workflow.service.FormService;
 import com.wflow.workflow.service.ProcessModelService;
-import com.wflow.workflow.service.ProcessNodeCatchService;
+import com.wflow.workflow.service.ProcessNodeCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class FormGroupServiceImpl implements ModelGroupService {
     private ProcessModelService modelService;
 
     @Autowired
-    private ProcessNodeCatchService nodeCatchService;
+    private ProcessNodeCacheService nodeCatchService;
 
     @Autowired
     private FormService formService;

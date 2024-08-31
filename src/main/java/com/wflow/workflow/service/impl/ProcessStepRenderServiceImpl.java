@@ -12,7 +12,7 @@ import com.wflow.workflow.bean.process.props.ConditionProps;
 import com.wflow.workflow.bean.vo.ProcessConditionResolveParamsVo;
 import com.wflow.workflow.execute.ElExecute;
 import com.wflow.workflow.service.ProcessModelService;
-import com.wflow.workflow.service.ProcessNodeCatchService;
+import com.wflow.workflow.service.ProcessNodeCacheService;
 import com.wflow.workflow.service.ProcessStepRenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class ProcessStepRenderServiceImpl implements ProcessStepRenderService {
     private ProcessModelService modelService;
 
     @Autowired
-    private ProcessNodeCatchService nodeCatchService;
+    private ProcessNodeCacheService nodeCatchService;
 
     @Override
     public List<String> getIsTrueConditions(ProcessConditionResolveParamsVo paramsVo) {

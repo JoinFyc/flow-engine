@@ -35,6 +35,12 @@ public class WflowGlobalVarDef {
     //任务处理结果变量前缀
     public static final String TASK_RES_PRE = "approve_";
 
+    //任务事件前缀
+    public static final String TASK_EVENT_PRE = "event_";
+
+    //有事件触发的最终审批人标识
+    public static final String LAST_AUDIT_EVENT_TAG = "last_audit_event_tag_";
+
     //系统审批管理员角色
     public static final String WFLOW_APPROVAL_ADMIN = "WFLOW_APPROVAL_ADMIN";
 

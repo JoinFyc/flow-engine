@@ -3,7 +3,7 @@ package com.wflow.workflow.task;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson2.JSONObject;
-import com.wflow.utils.BeanUtil;
+import com.wflow.utils.SpringContextUtil;
 import com.wflow.utils.EmailUtil;
 import com.wflow.workflow.UELTools;
 import com.wflow.workflow.bean.process.props.TriggerProps;
@@ -36,9 +36,9 @@ public class TriggerServiceTask implements JavaDelegate {
     public static UELTools uelTools;
 
     public TriggerServiceTask() {
-        runtimeService = BeanUtil.getBean(RuntimeService.class);
-        emailUtil = BeanUtil.getBean(EmailUtil.class);
-        uelTools = BeanUtil.getBean(UELTools.class);
+        runtimeService = SpringContextUtil.getBean(RuntimeService.class);
+        emailUtil = SpringContextUtil.getBean(EmailUtil.class);
+        uelTools = SpringContextUtil.getBean(UELTools.class);
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.wflow.workflow.service.NotifyService;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventType;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.event.*;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -77,6 +78,9 @@ public class GlobalTaskListener extends AbstractFlowableEngineEventListener impl
     @Override
     protected void taskCompleted(FlowableEngineEntityEvent event) {
         log.debug("监听到任务[{}]结束", event.getExecutionId());
+        final FlowableEventType type = event.getType();
+        //TODO 通知第三方接口,RPC接口通知就默认成功，失败让第三方调用查询接口来获取审批结果
+//      runtimeService.messageEventReceived()
         super.taskCompleted(event);
     }
 
@@ -111,6 +115,7 @@ public class GlobalTaskListener extends AbstractFlowableEngineEventListener impl
                         instance.getProcessDefinitionName(), "】已经通过").toString())
                 .build());
         runtimeService.updateBusinessStatus(event.getProcessInstanceId(), ProcessStatus.PASS.toString());
+        //TODO 监听节点变更，上下文处理
         listenerExecutor.doProcessChangeHandler("pass", event.getProcessInstanceId(), event.getProcessDefinitionId());
         log.info("[{}]审批流程[{}}]通过", instance.getProcessInstanceId(), instance.getProcessDefinitionName());
         super.processCompleted(event);

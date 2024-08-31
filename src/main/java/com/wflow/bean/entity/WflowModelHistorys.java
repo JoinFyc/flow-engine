@@ -51,5 +51,5 @@ public class WflowModelHistorys implements Serializable {
 
     private String logo;
 
-
+    private String businessEventKey;
 }

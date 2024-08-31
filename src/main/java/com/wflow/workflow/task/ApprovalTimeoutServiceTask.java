@@ -2,7 +2,7 @@ package com.wflow.workflow.task;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.wflow.utils.BeanUtil;
+import com.wflow.utils.SpringContextUtil;
 import com.wflow.workflow.bean.dto.NotifyDto;
 import com.wflow.workflow.bean.process.ProcessNode;
 import com.wflow.workflow.bean.process.enums.NodeTypeEnum;
@@ -10,7 +10,7 @@ import com.wflow.workflow.bean.process.props.ApprovalProps;
 import com.wflow.workflow.bean.vo.ProcessHandlerParamsVo;
 import com.wflow.workflow.config.WflowGlobalVarDef;
 import com.wflow.workflow.service.NotifyService;
-import com.wflow.workflow.service.ProcessNodeCatchService;
+import com.wflow.workflow.service.ProcessNodeCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -39,13 +39,13 @@ public class ApprovalTimeoutServiceTask implements JavaDelegate {
 
     private static NotifyService notifyService;
 
-    private static ProcessNodeCatchService nodeCatchService;
+    private static ProcessNodeCacheService nodeCatchService;
 
     public ApprovalTimeoutServiceTask() {
-        taskService = BeanUtil.getBean(TaskService.class);
-        historyService = BeanUtil.getBean(HistoryService.class);
-        notifyService = BeanUtil.getBean(NotifyService.class);
-        nodeCatchService = BeanUtil.getBean(ProcessNodeCatchService.class);
+        taskService = SpringContextUtil.getBean(TaskService.class);
+        historyService = SpringContextUtil.getBean(HistoryService.class);
+        notifyService = SpringContextUtil.getBean(NotifyService.class);
+        nodeCatchService = SpringContextUtil.getBean(ProcessNodeCacheService.class);
     }
 
     @Override

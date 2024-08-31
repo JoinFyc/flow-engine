@@ -3,7 +3,9 @@ package com.wflow.workflow.service.impl;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wflow.bean.entity.WflowModelHistorys;
 import com.wflow.bean.entity.WflowModels;
@@ -14,9 +16,10 @@ import com.wflow.mapper.WflowSubProcessMapper;
 import com.wflow.workflow.WFlowToBpmnCreator;
 import com.wflow.workflow.bean.process.ProcessNode;
 import com.wflow.workflow.bean.process.enums.NodeTypeEnum;
-import com.wflow.workflow.service.ProcessNodeCatchService;
+import com.wflow.workflow.service.ProcessNodeCacheService;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +35,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class MemoryProcessNodeCatchServiceImpl implements ProcessNodeCatchService {
+public class MemoryProcessNodeCatchServiceImpl implements ProcessNodeCacheService {
 
     @Autowired
     private WflowModelsMapper modelsMapper;

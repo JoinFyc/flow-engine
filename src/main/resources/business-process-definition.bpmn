@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+  <process id="wf66b1835694ce062c5c2b4d69" name="Test-并行流程" isExecutable="true">
+    <startEvent id="start" name="开始"></startEvent>
+    <userTask id="root" name="发起人" flowable:assignee="${initiator}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${nodeExecutionListener}"></flowable:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="start_root" sourceRef="start" targetRef="root"></sequenceFlow>
+    <userTask id="node_094355088939" name="办理人" flowable:assignee="${assignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${nodeExecutionListener}"></flowable:executionListener>
+        <flowable:taskListener event="all" delegateExpression="${userTaskListener}"></flowable:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${processTaskService.getNodeApprovalUsers(execution)}" flowable:elementVariable="assignee">
+        <completionCondition>${nrOfInstances == nrOfCompletedInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="node_094016923323" name="分支1" sourceRef="node_094016923688_begin" targetRef="node_094355088939"></sequenceFlow>
+    <userTask id="node_094382941405" name="办理人" flowable:assignee="${assignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${nodeExecutionListener}"></flowable:executionListener>
+        <flowable:taskListener event="all" delegateExpression="${userTaskListener}"></flowable:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${processTaskService.getNodeApprovalUsers(execution)}" flowable:elementVariable="assignee">
+        <completionCondition>${nrOfInstances == nrOfCompletedInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="node_094016925475" name="分支2" sourceRef="node_094016923688_begin" targetRef="node_094382941405"></sequenceFlow>
+    <parallelGateway id="node_094016923688_begin" name="并行分支"></parallelGateway>
+    <sequenceFlow id="root_node_094016923688_begin" sourceRef="root" targetRef="node_094016923688_begin"></sequenceFlow>
+    <parallelGateway id="node_094016923688_end" name="并行分支聚合"></parallelGateway>
+    <sequenceFlow id="node_094355088939_node_094016923688_end" sourceRef="node_094355088939" targetRef="node_094016923688_end"></sequenceFlow>
+    <sequenceFlow id="node_094382941405_node_094016923688_end" sourceRef="node_094382941405" targetRef="node_094016923688_end"></sequenceFlow>
+    <userTask id="node_094699136568" name="审批人" flowable:assignee="${assignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" delegateExpression="${nodeExecutionListener}"></flowable:executionListener>
+        <flowable:taskListener event="all" delegateExpression="${userTaskListener}"></flowable:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${processTaskService.getNodeApprovalUsers(execution)}" flowable:elementVariable="assignee">
+        <completionCondition>${nrOfInstances == nrOfCompletedInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="node_094016923688_end_node_094699136568" sourceRef="node_094016923688_end" targetRef="node_094699136568"></sequenceFlow>
+    <sequenceFlow id="node_094699136568_process-end" sourceRef="node_094699136568" targetRef="process-end"></sequenceFlow>
+    <endEvent id="process-end" name="审批流程结束"></endEvent>
+    <endEvent id="cancel-end" name="审批流程撤消">
+      <terminateEventDefinition flowable:terminateAll="true"></terminateEventDefinition>
+    </endEvent>
+    <endEvent id="refuse-end" name="审批流程被驳回">
+      <terminateEventDefinition flowable:terminateAll="true"></terminateEventDefinition>
+    </endEvent>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_wf66b1835694ce062c5c2b4d69">
+    <bpmndi:BPMNPlane bpmnElement="wf66b1835694ce062c5c2b4d69" id="BPMNPlane_wf66b1835694ce062c5c2b4d69">
+      <bpmndi:BPMNShape bpmnElement="refuse-end" id="BPMNShape_refuse-end">
+        <omgdc:Bounds height="30.0" width="30.0" x="0.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="root" id="BPMNShape_root">
+        <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="30.0" width="30.0" x="0.0" y="95.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cancel-end" id="BPMNShape_cancel-end">
+        <omgdc:Bounds height="30.0" width="30.0" x="0.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_094382941405" id="BPMNShape_node_094382941405">
+        <omgdc:Bounds height="60.0" width="100.0" x="320.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_094699136568" id="BPMNShape_node_094699136568">
+        <omgdc:Bounds height="60.0" width="100.0" x="560.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_094016923688_begin" id="BPMNShape_node_094016923688_begin">
+        <omgdc:Bounds height="40.0" width="40.0" x="230.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="process-end" id="BPMNShape_process-end">
+        <omgdc:Bounds height="30.0" width="30.0" x="710.0" y="95.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_094355088939" id="BPMNShape_node_094355088939">
+        <omgdc:Bounds height="60.0" width="100.0" x="320.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="node_094016923688_end" id="BPMNShape_node_094016923688_end">
+        <omgdc:Bounds height="40.0" width="40.0" x="470.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="node_094355088939_node_094016923688_end" id="BPMNEdge_node_094355088939_node_094016923688_end">
+        <omgdi:waypoint x="420.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_094016923323" id="BPMNEdge_node_094016923323">
+        <omgdi:waypoint x="270.0" y="102.5"></omgdi:waypoint>
+        <omgdi:waypoint x="282.0" y="102.5"></omgdi:waypoint>
+        <omgdi:waypoint x="282.0" y="30.000000000000007"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="30.000000000000007"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_094699136568_process-end" id="BPMNEdge_node_094699136568_process-end">
+        <omgdi:waypoint x="660.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="710.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_094382941405_node_094016923688_end" id="BPMNEdge_node_094382941405_node_094016923688_end">
+        <omgdi:waypoint x="420.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="start_root" id="BPMNEdge_start_root">
+        <omgdi:waypoint x="30.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="80.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_094016925475" id="BPMNEdge_node_094016925475">
+        <omgdi:waypoint x="270.0" y="117.5"></omgdi:waypoint>
+        <omgdi:waypoint x="282.0" y="117.5"></omgdi:waypoint>
+        <omgdi:waypoint x="282.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="node_094016923688_end_node_094699136568" id="BPMNEdge_node_094016923688_end_node_094699136568">
+        <omgdi:waypoint x="510.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="560.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="root_node_094016923688_begin" id="BPMNEdge_root_node_094016923688_begin">
+        <omgdi:waypoint x="180.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

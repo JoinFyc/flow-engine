@@ -2,151 +2,275 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <groupId>org.example</groupId>
-  <artifactId>wflow-server</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.0.5</version>
-    <relativePath/>
-  </parent>
-  
-  <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <java.version>17</java.version>
-    <!--项目编码-->
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-<!--    <flowable.version>6.7.2</flowable.version>-->
-    <flowable.version>7.0.0</flowable.version>
-  </properties>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.20</version>
-    </dependency>
-    
-    <!-- https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2 -->
-    <dependency>
-      <groupId>com.alibaba.fastjson2</groupId>
-      <artifactId>fastjson2</artifactId>
-      <version>2.0.40</version>
-    </dependency>
+    <modelVersion>4.0.0</modelVersion>
 
-<!--    js脚本引擎依赖-->
-    <dependency>
-      <groupId>org.openjdk.nashorn</groupId>
-      <artifactId>nashorn-core</artifactId>
-      <version>15.4</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.baomidou</groupId>
-      <artifactId>mybatis-plus-boot-starter</artifactId>
-      <version>3.5.7</version>
-    </dependency>
-    
-    <!-- MySQL 连接驱动依赖 -->
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.49</version>
-    </dependency>
-  
-    <!-- Sa-Token 权限认证, 在线文档：http://sa-token.dev33.cn/ -->
-    <dependency>
-      <groupId>cn.dev33</groupId>
-      <artifactId>sa-token-spring-boot3-starter</artifactId>
-      <version>1.34.0</version>
-    </dependency>
-  
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-  
-    <!-- spring mail -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-mail</artifactId>
-    </dependency>
-  
-    <dependency>
-      <groupId>cn.hutool</groupId>
-      <artifactId>hutool-all</artifactId>
-      <version>5.3.5</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.belerweb</groupId>
-      <artifactId>pinyin4j</artifactId>
-      <version>2.5.1</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.flowable</groupId>
-      <artifactId>flowable-spring-boot-starter-actuator</artifactId>
-      <version>${flowable.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.mybatis</groupId>
-          <artifactId>mybatis</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-  
-    <dependency>
-      <groupId>com.googlecode.aviator</groupId>
-      <artifactId>aviator</artifactId>
-      <version>5.3.1</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-    </dependency>
-    
-    <!--js沙箱环境，资源保护-->
-    <dependency>
-      <groupId>org.javadelight</groupId>
-      <artifactId>delight-nashorn-sandbox</artifactId>
-      <version>0.3.2</version>
-    </dependency>
-    
-    <!-- <dependency>
-       <groupId>org.springframework.boot</groupId>
-       <artifactId>spring-boot-starter-data-redis</artifactId>
-     </dependency>-->
-    
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-devtools</artifactId>
-      <optional>true</optional>
-    </dependency>
-  </dependencies>
-  
-  <build>
-    <plugins>
-      <plugin>
+    <groupId>com.bnguan</groupId>
+    <artifactId>wflow-server</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <parent>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <configuration>
-          <fork>true</fork>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.0.5</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <!--maven-->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.test.skip>true</maven.test.skip>
+        <!--JDK-->
+        <java.version>17</java.version>
+        <!--编码-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!--Flowable-->
+        <flowable.version>7.0.0</flowable.version>
+        <!--镜像-->
+        <docker.image.name>${project.artifactId}</docker.image.name>
+        <docker.image.version>${project.version}</docker.image.version>
+        <!--仓库-->
+        <docker.registry.host>192.168.70.115:8088</docker.registry.host>
+        <docker.host>http://192.168.70.115:2375</docker.host>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version>
+        </dependency>
+
+        <!-- fastjson2-->
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>2.0.40</version>
+        </dependency>
+
+        <!-- js脚本引擎依赖-->
+        <dependency>
+            <groupId>org.openjdk.nashorn</groupId>
+            <artifactId>nashorn-core</artifactId>
+            <version>15.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.7</version>
+        </dependency>
+
+        <!-- MySQL 连接驱动依赖 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.49</version>
+        </dependency>
+
+        <!-- Sa-Token 权限认证, 在线文档：http://sa-token.dev33.cn/ -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot3-starter</artifactId>
+            <version>1.34.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- spring mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.3.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-actuator</artifactId>
+            <version>${flowable.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mybatis</groupId>
+                    <artifactId>mybatis</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Flowable REST API Dependencies -->
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-rest</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.aviator</groupId>
+            <artifactId>aviator</artifactId>
+            <version>5.3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <!--js沙箱环境，资源保护-->
+        <dependency>
+            <groupId>org.javadelight</groupId>
+            <artifactId>delight-nashorn-sandbox</artifactId>
+            <version>0.3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>3.0.5</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <!-- 打包插件 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.wflow.AppStater</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <!-- 指定JDK编译版本 -->
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.13</version>
+<!--                <configuration>-->
+<!--                    <env>-->
+<!--                        <TZ>Asia/Shanghai</TZ>-->
+<!--                        <LANG>zh_CN.UTF-8</LANG>-->
+<!--                    </env>-->
+<!--                    &lt;!&ndash;时区配置&ndash;&gt;-->
+<!--                    <runs>-->
+<!--                        <run>ln -snf /usr/share/zoneinfo/$TZ /etc/localtime</run>-->
+<!--                        <run>echo $TZ > /etc/timezone</run>-->
+<!--                    </runs>-->
+
+<!--                    <imageName>${docker.image.name}:${docker.image.version}-${profiles.active}</imageName>-->
+<!--                    <baseImage>openjdk:17-jdk-slim</baseImage>-->
+<!--                    <workdir>/root/bng</workdir>-->
+<!--                    <cmd>["java", "-jar", "-Dapp.serial.no=hr1", "-Dsofa.basic.uniqueId=basic99", "-Dapp.group=999", "&#45;&#45;spring.profiles.active=dev"]</cmd>-->
+<!--                    <dockerHost>${docker.host}</dockerHost>-->
+<!--                    <resources>-->
+<!--                        <resource>-->
+<!--                            <targetPath>/opt</targetPath>-->
+<!--                            <directory>${project.build.directory}</directory>-->
+<!--                            <include>${project.build.finalName}.jar</include>-->
+<!--                        </resource>-->
+<!--                    </resources>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>build</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>tag-image</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>tag</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <forceTags>true</forceTags>-->
+<!--                            <image>${docker.image.name}:${docker.image.version}-${profiles.active}</image>-->
+<!--                            <newName>-->
+<!--                                ${docker.registry.host}/${docker.image.name}:${docker.image.version}-${profiles.active}-->
+<!--                            </newName>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                    &lt;!&ndash; Push the image. &ndash;&gt;-->
+<!--                    <execution>-->
+<!--                        <id>push-image</id>-->
+<!--                        <phase>deploy</phase>  &lt;!&ndash;没有deploy的地方，先放到package&ndash;&gt;-->
+<!--                        <goals>-->
+<!--                            <goal>push</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <imageName>-->
+<!--                                ${docker.registry.host}/${docker.image.name}:${docker.image.version}-${profiles.active}-->
+<!--                            </imageName>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profiles.active>dev</profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <profiles.active>test</profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 </project>
