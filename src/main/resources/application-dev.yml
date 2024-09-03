@@ -75,7 +75,7 @@ spring:
             required: true
   data:
     redis:
-      host: localhost
+      host: 192.168.70.106
       port: 6379
       password: 123456
 
