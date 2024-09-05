@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
  * @description 流程模型
  * @date 2024-08-27
  */
-@Tag(name = "流程模型", description = "流程模型相关接口")
+@Tag(name = "模型分类", description = "模型分类相关接口")
 @RestController
 @RequestMapping("/flow-engine/rest/model/group")
 public class ProcessModelGroupFacadeController {

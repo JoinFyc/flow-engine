@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.wflow.bean.FlowProcessContext;
 import com.wflow.service.OrgRepositoryService;
 import com.wflow.service.OrgUserAndDeptService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,7 @@ public class OrgTreeFacadeController {
      * @return 组织架构树数据
      */
     @GetMapping("company")
+    @Operation(summary = "查询公司一级部门")
     public Object getOrgTreeData(@RequestParam Long coNo){
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
@@ -48,6 +50,7 @@ public class OrgTreeFacadeController {
      * @return 组织架构树数据
      */
     @GetMapping("tree")
+    @Operation(summary = "查询组织架构树")
     public Object getOrgTreeData(@RequestParam(defaultValue = "0") String deptId,
                                  @RequestParam String type){
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
@@ -62,6 +65,7 @@ public class OrgTreeFacadeController {
      * @return 匹配到的用户
      */
     @GetMapping("tree/user/search")
+    @Operation(summary = "模糊搜索用户")
     public Object getOrgTreeUser(@RequestParam String userName){
         if(StrUtil.isEmpty(userName)) return "用户名不能为空";
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();

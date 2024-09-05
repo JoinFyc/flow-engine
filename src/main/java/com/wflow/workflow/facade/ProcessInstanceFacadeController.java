@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * @description 流程模型
  * @date 2024-08-27
  */
-@Tag(name = "流程模型", description = "流程模型相关接口")
+@Tag(name = "表单处理", description = "表单处理相关接口")
 @RestController
 @RequestMapping("/flow-engine/rest/instance")
 public class ProcessInstanceFacadeController {
@@ -58,6 +58,7 @@ public class ProcessInstanceFacadeController {
      * @return 列表数据
      */
     @GetMapping("submittedList")
+    @Operation(summary = "我发起的")
     public Object getUserSubmittedList(@RequestParam(defaultValue = "20") Integer pageSize,
                                        @RequestParam(defaultValue = "1") Integer pageNo,
                                        @RequestParam(required = false) String formId,
@@ -85,6 +86,7 @@ public class ProcessInstanceFacadeController {
      * @return 超送我的审批实例
      */
     @GetMapping("ccMe")
+    @Operation(summary = "抄送我的")
     public Object getCcMeInstance(@RequestParam(defaultValue = "20") Integer pageSize,
                                   @RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(required = false) String[] startTimes,
@@ -109,6 +111,7 @@ public class ProcessInstanceFacadeController {
      * @return 分页列表数据
      */
     @GetMapping("todoList")
+    @Operation(summary = "待我处理")
     public Object getUserTodoList(@RequestParam(defaultValue = "20") Integer pageSize,
                                   @RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(required = false) String formId,
@@ -133,6 +136,7 @@ public class ProcessInstanceFacadeController {
      * @return 流程进度及表单详情
      */
     @GetMapping("progress")
+    @Operation(summary = "流程详情-进程")
     public Object getProcessFormAndInstanceProgress(@RequestParam String instanceId,@RequestParam(required = false) String nodeId,@RequestParam String userId) {
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
@@ -148,6 +152,7 @@ public class ProcessInstanceFacadeController {
      * @return 操作结果
      */
     @PostMapping("handler")
+    @Operation(summary = "流程处理")
     public Object approvalTask(@RequestBody ProcessHandlerParamsVo params) {
         String userId = params.getUserId();
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
@@ -164,6 +169,7 @@ public class ProcessInstanceFacadeController {
      * @return 统计数据
      */
     @GetMapping("instance/count")
+    @Operation(summary = "工作台-统计")
     public Object getProcessInstanceCount() {
         return R.ok(processService.getProcessInstanceCount());
     }
