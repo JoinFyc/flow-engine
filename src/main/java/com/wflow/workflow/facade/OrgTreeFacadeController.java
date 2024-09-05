@@ -1,5 +1,6 @@
 package com.wflow.workflow.facade;
 
+import cn.hutool.core.util.StrUtil;
 import com.wflow.bean.FlowProcessContext;
 import com.wflow.service.OrgRepositoryService;
 import com.wflow.service.OrgUserAndDeptService;
@@ -62,6 +63,7 @@ public class OrgTreeFacadeController {
      */
     @GetMapping("tree/user/search")
     public Object getOrgTreeUser(@RequestParam String userName){
+        if(StrUtil.isEmpty(userName)) return "用户名不能为空";
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
         flowProcessContext.setFieldDesc("查询组织架构树-模糊搜索用户");

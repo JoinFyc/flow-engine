@@ -79,7 +79,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     public List<OrgTreeVo> selectUsersByPy(String py) {
         final FlowProcessContext flowProcessContext = FlowProcessContext.getFlowProcessContext();
         if(flowProcessContext != null && flowProcessContext.getFieldTag()) {
-           return hrmStaffInfoMapper.selectUsersLikeName(py.concat("%")).stream()
+           return hrmStaffInfoMapper.selectUsersLikeName(py).stream()
                     .peek(u -> u.setType("user")).collect(Collectors.toList());
         }
         return usersMapper.selectUsersByPy(py).stream()
@@ -116,7 +116,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                     .map(u -> new DeptDo(u.getId(), u.getDeptName(), u.getLeader(), u.getParentId()))
                     .collect(Collectors.toList()) :
                     orgDeptMapper.selectBatchIds(deptIds).stream()
-                            .map(u -> new DeptDo(u.getAutoNo().toString(), u.getName(), u.getResponsibleId().toString(), u.getParentDeptId().toString()))
+                            .map(u -> new DeptDo(u.getAutoNo().toString(), u.getName(), u.getResponsibleId() == null ? "" : u.getResponsibleId().toString(), u.getParentDeptId() == null ? "": u.getParentDeptId().toString()))
                             .collect(Collectors.toList());
         } catch (Exception e) {
             return Collections.emptyList();
@@ -157,8 +157,8 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
             DeptDo deptDo = new DeptDo();
             deptDo.setId(orgDept.getAutoNo().toString());
             deptDo.setDeptName(orgDept.getName());
-            deptDo.setLeader(orgDept.getResponsibleId().toString());
-            deptDo.setParentId(orgDept.getParentDeptId().toString());
+            deptDo.setLeader(orgDept.getResponsibleId() == null ? "" : orgDept.getResponsibleId().toString());
+            deptDo.setParentId(orgDept.getParentDeptId() == null ? "" : orgDept.getParentDeptId().toString());
             return deptDo;
         }
         return null;
@@ -167,12 +167,12 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Override
     public List<DeptDo> getSysAllDepts() {
         try {
-            return FlowProcessContext.getFlowProcessContext() == null? departsMapper.selectList(null).stream()
+            return FlowProcessContext.getFlowProcessContext() == null ? departsMapper.selectList(null).stream()
                     .map(d -> new DeptDo(d.getId(), d.getDeptName(), d.getLeader(), d.getParentId()))
                     .collect(Collectors.toList()) :
                     orgDeptMapper.selectList(null).stream()
-                            .map(d -> new DeptDo(d.getAutoNo().toString(), d.getName(), d.getResponsibleId().toString(), d.getParentDeptId().toString()))
-                            .collect(Collectors.toList())  ;
+                            .map(d -> new DeptDo(d.getAutoNo().toString(), d.getName(), d.getResponsibleId() == null ? "" : d.getResponsibleId().toString(), d.getParentDeptId().toString()))
+                            .collect(Collectors.toList());
         } catch (Exception e) {
             return Collections.emptyList();
         }

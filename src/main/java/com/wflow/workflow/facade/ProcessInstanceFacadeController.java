@@ -35,7 +35,7 @@ public class ProcessInstanceFacadeController {
      * @param params 参数
      * @return 操作结果
      */
-    @PostMapping("start/{defId}")
+    @PostMapping("start")
     @Operation(summary = "发起流程")
     public Object startProcess(@RequestParam String defId,
                                @RequestParam String userId,
@@ -156,6 +156,16 @@ public class ProcessInstanceFacadeController {
         flowProcessContext.setFieldDesc("用户处理任务，审批、转交、评论、撤销等操作");
         taskService.approvalTask(userId, userId, params);
         return R.ok("处理成功");
+    }
+
+    /**
+     * 查询工作台上方 我发起的、带我处理、关于我的统计数量
+     *
+     * @return 统计数据
+     */
+    @GetMapping("instance/count")
+    public Object getProcessInstanceCount() {
+        return R.ok(processService.getProcessInstanceCount());
     }
 
 }

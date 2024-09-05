@@ -18,7 +18,7 @@ spring:
           password: Fanxin@Sbz123!@#
           driverClassName: com.mysql.jdbc.Driver
         slave:
-          url: jdbc:mysql://cuslter-pm-2023.rwlb.zhangbei.rds.aliyuncs.com:3306/hr?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&tinyInt1isBit=false
+          url: jdbc:mysql://cuslter-pm-2023.rwlb.zhangbei.rds.aliyuncs.com:3306/hr_test?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&tinyInt1isBit=false
           username: fanxin_pm_master
           password: Fanxin@Sbz123!@#
           driverClassName: com.mysql.jdbc.Driver
