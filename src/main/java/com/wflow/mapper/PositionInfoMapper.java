@@ -14,7 +14,7 @@ import java.util.List;
  * @author : willian fu
  * @date : 2022/7/4
  */
-@DS("slave")
+@DS("hr")
 public interface PositionInfoMapper extends BaseMapper<PositionInfo> {
 
 

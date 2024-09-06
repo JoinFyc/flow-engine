@@ -13,7 +13,7 @@ import java.util.List;
  * @author : willian fu
  * @date : 2022/7/4
  */
-@DS("slave")
+@DS("hr")
 public interface HrmStaffInfoMapper extends BaseMapper<HrmStaffInfo> {
 
 
@@ -22,7 +22,7 @@ public interface HrmStaffInfoMapper extends BaseMapper<HrmStaffInfo> {
      * @param deptId 部门ID
      * @return 用户列表 type为固定值user
      */
-    @Select("SELECT ou.auto_no id, ou.user_name name, ou.personal_photo  avatar FROM hrm_staff_info ou " +
+    @Select("SELECT ou.auto_no id, ou.staff_name name, ou.personal_photo  avatar FROM hrm_staff_info ou " +
             "WHERE ou.dept_no = #{deptId} ")
     List<OrgTreeVo> selectUsersByDept(@Param("deptId") Long deptId);
 

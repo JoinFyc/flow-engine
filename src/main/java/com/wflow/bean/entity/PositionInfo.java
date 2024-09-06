@@ -1,6 +1,8 @@
 package com.wflow.bean.entity;
 
 import com.alibaba.fastjson2.annotation.JSONField;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.*;
 
 import java.io.Serializable;
@@ -24,6 +26,7 @@ public class PositionInfo implements Serializable {
     /**
      * bigint(20) UNSIGNED  职位ID
      */
+    @TableId(type = IdType.ASSIGN_ID)
     private Long autoNo;
     /**
      * varchar(50)  职位名称

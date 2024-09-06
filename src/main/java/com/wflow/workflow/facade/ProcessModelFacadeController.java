@@ -66,5 +66,15 @@ public class ProcessModelFacadeController {
         flowProcessContext.setFieldTag(Boolean.TRUE);
         return R.ok(modelGroupService.getGroupModels(null, null));
     }
+    /**
+     * 查询流程模型数据
+     * @param formId 模板id
+     * @return 流程模型详情数据
+     */
+    @GetMapping("detail")
+    @Operation(summary = "查询流程模型数据")
+    public Object getModelById(@RequestParam String formId) {
+        return R.ok(modelGroupService.getModelById(formId));
+    }
 
 }
