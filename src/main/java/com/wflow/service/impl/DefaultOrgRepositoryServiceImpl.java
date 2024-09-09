@@ -12,10 +12,14 @@ import com.wflow.bean.vo.OrgTreeVo;
 import com.wflow.bean.vo.UserVo;
 import com.wflow.exception.BusinessException;
 import com.wflow.mapper.*;
+import com.wflow.service.HrmService;
 import com.wflow.service.OrgRepositoryService;
+import com.wflow.service.OrgService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,10 +51,11 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     private WflowModelPermsMapper modelPermsMapper;
 
     @Autowired
-    private HrmStaffInfoMapper hrmStaffInfoMapper;
+    private HrmService hrmService;
 
     @Autowired
-    private OrgDeptMapper orgDeptMapper;
+    private OrgService orgService;
+
 
     @Override
     public List<ModelGroupVo.Form> getModelsByPerm(String userId) {
@@ -58,6 +63,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public UserDo getUserById(String userId) {
         if(FlowProcessContext.getFlowProcessContext() == null) {
             WflowUsers wflowUsers = usersMapper.selectById(userId);
@@ -67,7 +73,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                 return userDo;
             }
         }
-        final HrmStaffInfo hrmStaffInfo = hrmStaffInfoMapper.selectById(Long.valueOf(userId));
+        final HrmStaffInfo hrmStaffInfo = hrmService.selectByUserId(Long.parseLong(userId));
         UserDo userDo = new UserDo();
         userDo.setUserId(userId);
         userDo.setUserName(hrmStaffInfo.getUserName());
@@ -76,10 +82,11 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<OrgTreeVo> selectUsersByPy(String py) {
         final FlowProcessContext flowProcessContext = FlowProcessContext.getFlowProcessContext();
         if(flowProcessContext != null && flowProcessContext.getFieldTag()) {
-           return hrmStaffInfoMapper.selectUsersLikeName(py).stream()
+           return hrmService.selectUsersLikeName(py).stream()
                     .peek(u -> u.setType("user")).collect(Collectors.toList());
         }
         return usersMapper.selectUsersByPy(py).stream()
@@ -87,21 +94,23 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<OrgTreeVo> selectUsersByDept(String deptId) {
         List<OrgTreeVo> orgTreeVos = FlowProcessContext.getFlowProcessContext() == null ?
                 usersMapper.selectUsersByDept(deptId) :
-                hrmStaffInfoMapper.selectUsersByDept(Long.valueOf(deptId));
+                hrmService.selectUsersByDept(Long.valueOf(deptId));
         orgTreeVos.forEach(v -> v.setType("user"));
         return orgTreeVos;
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<UserDo> getUsersBatch(Collection<String> userIds) {
         try {
             return FlowProcessContext.getFlowProcessContext() == null ? usersMapper.selectBatchIds(userIds).stream()
                     .map(u -> new UserDo(u.getUserId(), u.getUserName(), u.getAvatar()))
                     .collect(Collectors.toList()) :
-                    hrmStaffInfoMapper.selectBatchIds(userIds).stream()
+                    hrmService.selectBatchIds(userIds).stream()
                             .map(u -> new UserDo(u.getAutoNo().toString(), u.getUserName(), u.getPersonalPhoto()))
                             .collect(Collectors.toList());
         } catch (Exception e) {
@@ -110,12 +119,13 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<DeptDo> getDeptBatch(Collection<String> deptIds) {
         try {
             return FlowProcessContext.getFlowProcessContext() == null ? departsMapper.selectBatchIds(deptIds).stream()
                     .map(u -> new DeptDo(u.getId(), u.getDeptName(), u.getLeader(), u.getParentId()))
                     .collect(Collectors.toList()) :
-                    orgDeptMapper.selectBatchIds(deptIds).stream()
+                    orgService.selectBatchIds(deptIds).stream()
                             .map(u -> new DeptDo(u.getAutoNo().toString(), u.getName(), u.getResponsibleId() == null ? "" : u.getResponsibleId().toString(), u.getParentDeptId() == null ? "": u.getParentDeptId().toString()))
                             .collect(Collectors.toList());
         } catch (Exception e) {
@@ -124,6 +134,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Set<String> getUsersByDepts(Collection<String> deptIds) {
         try {
             return FlowProcessContext.getFlowProcessContext() == null ? userDepartmentsMapper.selectList(
@@ -132,17 +143,14 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                             .in(WflowUserDepartments::getDeptId, deptIds))
                     .stream().map(WflowUserDepartments::getUserId)
                     .collect(Collectors.toSet()) :
-                    hrmStaffInfoMapper.selectList(
-                            new LambdaQueryWrapper<HrmStaffInfo>()
-                                    .select(HrmStaffInfo::getAutoNo)
-                                    .in(HrmStaffInfo::getDeptNo, deptIds.stream().map(Long::parseLong).collect(Collectors.toSet()))
-                    ).stream().map(s -> s.getAutoNo().toString()).collect(Collectors.toSet());
+                    hrmService.selectList(deptIds);
         } catch (Exception e) {
             return Collections.emptySet();
         }
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public DeptDo getDeptById(String deptId) {
         if(FlowProcessContext.getFlowProcessContext() == null) {
             WflowDepartments departments = departsMapper.selectById(deptId);
@@ -152,7 +160,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                 return deptDo;
             }
         }
-        final OrgDept orgDept = orgDeptMapper.selectById(Long.valueOf(deptId));
+        final OrgDept orgDept = orgService.selectById(Long.valueOf(deptId));
         if (Objects.nonNull(orgDept)) {
             DeptDo deptDo = new DeptDo();
             deptDo.setId(orgDept.getAutoNo().toString());
@@ -165,12 +173,13 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<DeptDo> getSysAllDepts() {
         try {
             return FlowProcessContext.getFlowProcessContext() == null ? departsMapper.selectList(null).stream()
                     .map(d -> new DeptDo(d.getId(), d.getDeptName(), d.getLeader(), d.getParentId()))
                     .collect(Collectors.toList()) :
-                    orgDeptMapper.selectList(null).stream()
+                    orgService.selectList(null).stream()
                             .map(d -> new DeptDo(d.getAutoNo().toString(), d.getName(), d.getResponsibleId() == null ? "" : d.getResponsibleId().toString(), d.getParentDeptId().toString()))
                             .collect(Collectors.toList());
         } catch (Exception e) {
@@ -179,12 +188,13 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<UserDeptDo> getSysAllUserDepts() {
         try {
             return FlowProcessContext.getFlowProcessContext() == null? userDepartmentsMapper.selectList(null).stream()
                     .map(d -> new UserDeptDo(d.getUserId(), d.getDeptId()))
                     .collect(Collectors.toList()) :
-                    hrmStaffInfoMapper.selectList(null).stream()
+                    hrmService.selectList().stream()
                             .map(d -> new UserDeptDo(d.getAutoNo().toString(), d.getDeptNo().toString()))
                             .collect(Collectors.toList());
         } catch (Exception e) {
@@ -193,8 +203,9 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<OrgTreeVo> getDeptByCoNo(Long coNo) {
-        return  orgDeptMapper.selectList(new LambdaQueryWrapper<OrgDept>()
+        return  orgService.selectList(new LambdaQueryWrapper<OrgDept>()
                                 .select(OrgDept::getAutoNo, OrgDept::getName)
                                 .eq(OrgDept::getCoNo, coNo))
                         .stream().map(v -> OrgTreeVo.builder().id(v.getAutoNo().toString())
@@ -204,6 +215,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<OrgTreeVo> getSubDeptById(String parentId) {
         return FlowProcessContext.getFlowProcessContext() == null?
                 departsMapper.selectList(new LambdaQueryWrapper<WflowDepartments>()
@@ -214,7 +226,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                         .type("dept").build())
                 .collect(Collectors.toList())
                 :
-                orgDeptMapper.selectList(new LambdaQueryWrapper<OrgDept>()
+                orgService.selectList(new LambdaQueryWrapper<OrgDept>()
                                 .select(OrgDept::getAutoNo, OrgDept::getName)
                                 .eq(OrgDept::getParentDeptId, parentId))
                         .stream().map(v -> OrgTreeVo.builder().id(v.getAutoNo().toString())
@@ -224,6 +236,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<String> getRecursiveSubDept(String parentId) {
         List<String> list = new ArrayList<>();
         loadSubDept(parentId, list);
@@ -243,7 +256,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
             subDepts.addAll(departments.stream().map(WflowDepartments::getId).collect(Collectors.toList()));
             departments.forEach(d -> loadSubDept(d.getId(), subDepts));
         }else {
-            List<OrgDept> departments = orgDeptMapper.selectList(
+            List<OrgDept> departments = orgService.selectList(
                     new LambdaQueryWrapper<OrgDept>()
                             .eq(OrgDept::getParentDeptId, Long.valueOf(parentId)));
             subDepts.addAll(departments.stream().map(d -> d.getAutoNo().toString()).collect(Collectors.toList()));
@@ -281,6 +294,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public UserVo getUserDetail(String userId) {
         if (FlowProcessContext.getFlowProcessContext() == null) {
             WflowUsers user = usersMapper.selectById(userId);
@@ -298,7 +312,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                     .roles(roles.stream().map(WflowRoles::getRoleName).collect(Collectors.toList()))
                     .build();
         }
-        final HrmStaffInfo hrmStaffInfo = hrmStaffInfoMapper.selectById(Long.valueOf(userId));
+        final HrmStaffInfo hrmStaffInfo = hrmService.selectByUserId(Long.valueOf(userId));
         if(hrmStaffInfo==null){
             throw new BusinessException("员工信息不存在");
         }
@@ -318,15 +332,16 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<DeptDo> getDeptsByUser(String userId) {
         if(FlowProcessContext.getFlowProcessContext()==null){
             return userDepartmentsMapper.getUserDepts(userId);
         }
-        final HrmStaffInfo hrmStaffInfo = hrmStaffInfoMapper.selectById(Long.valueOf(userId));
+        final HrmStaffInfo hrmStaffInfo = hrmService.selectByUserId(Long.valueOf(userId));
         if(hrmStaffInfo==null){
             throw new BusinessException("员工信息不存在");
         }
-        return orgDeptMapper.selectList(
+        return orgService.selectList(
                 new LambdaQueryWrapper<OrgDept>()
                         .select(OrgDept::getAutoNo,OrgDept::getName)
                         .eq(OrgDept::getAutoNo,hrmStaffInfo.getAutoNo()

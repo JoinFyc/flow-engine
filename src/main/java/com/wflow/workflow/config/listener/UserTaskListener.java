@@ -171,7 +171,8 @@ public class UserTaskListener implements TaskListener{
                 defName = modelHistory.getFormName();
             }
         }
-        OrgUser orgUser = userService.getUserMapByIds(CollectionUtil.newArrayList(startUser)).get(startUser);
+        //TODO 监听器不好拿数据
+        //        OrgUser orgUser = userService.getUserMapByIds(CollectionUtil.newArrayList(startUser)).get(startUser);
         notifyService.notify(NotifyDto.builder()
                 .title(isRefuse ? "您提交的审批被驳回" : "您有新的待办任务")
                 .processDefId(dfId)
@@ -179,7 +180,8 @@ public class UserTaskListener implements TaskListener{
                 .nodeId(delegateTask.getTaskDefinitionKey())
                 .target(isRefuse ? startUser : assignee)
                 .content(isRefuse ? StrUtil.builder("您提交的【", defName, "】已被驳回").toString()
-                        : StrUtil.builder(orgUser.getName(), " 提交的【", defName, "】需要您审批，请即时处理"
+//                        : StrUtil.builder(orgUser.getName(), " 提交的【", defName, "】需要您审批，请即时处理"
+                        : StrUtil.builder(startUser, " 提交的【", defName, "】需要您审批，请即时处理"
                 ).toString())
                 .type(isRefuse ? NotifyDto.TypeEnum.ERROR : NotifyDto.TypeEnum.WARNING)
                 .build());
