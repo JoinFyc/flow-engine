@@ -15,6 +15,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class HrmStaffInfo implements Serializable {
 
     /**

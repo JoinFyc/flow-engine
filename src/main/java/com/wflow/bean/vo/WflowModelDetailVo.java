@@ -22,6 +22,9 @@ public class WflowModelDetailVo {
     //流程ID
     private String formId;
 
+    //流程分组类型
+    private String groupType;
+
     //流程定义ID
     private String processDefId;
 

@@ -52,4 +52,9 @@ public class WflowModelHistorys implements Serializable {
     private String logo;
 
     private String businessEventKey;
+
+    /**
+     * 表单类型
+     */
+    private String formType;
 }

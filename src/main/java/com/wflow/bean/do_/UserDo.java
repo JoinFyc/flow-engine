@@ -18,4 +18,6 @@ public class UserDo {
     private String userName;
 
     private String avatar;
+
+    private String tenantId;
 }

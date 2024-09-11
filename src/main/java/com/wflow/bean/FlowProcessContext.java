@@ -1,5 +1,7 @@
 package com.wflow.bean;
 
+import com.wflow.bean.do_.LoginDo;
+import com.wflow.utils.RpcUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +18,7 @@ public class FlowProcessContext implements AutoCloseable {
 
     private Boolean fieldTag = Boolean.TRUE;
     private String userId;
-    private Long coNo;
+    private String tenantId;
     private Long groupId;
 
     private String fieldDesc;
@@ -26,7 +28,10 @@ public class FlowProcessContext implements AutoCloseable {
     }
 
     public static FlowProcessContext initFlowProcessContext() {
-        FlowProcessContext context = new FlowProcessContext();
+         FlowProcessContext context = new FlowProcessContext();
+        final LoginDo loginDo = RpcUtil.getLoginTenant();
+        context.setUserId(loginDo.getUserId());
+        context.setTenantId(loginDo.getTenantId());
         CONTEXT_HOLDER.set(context);
         return CONTEXT_HOLDER.get();
     }

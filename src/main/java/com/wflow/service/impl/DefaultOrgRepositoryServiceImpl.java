@@ -73,12 +73,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                 return userDo;
             }
         }
-        final HrmStaffInfo hrmStaffInfo = hrmService.selectByUserId(Long.parseLong(userId));
-        UserDo userDo = new UserDo();
-        userDo.setUserId(userId);
-        userDo.setUserName(hrmStaffInfo.getUserName());
-        userDo.setAvatar(hrmStaffInfo.getPersonalPhoto());
-        return userDo;
+        return hrmService.selectByUserId(Long.parseLong(userId));
     }
 
     @Override
@@ -108,10 +103,10 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     public List<UserDo> getUsersBatch(Collection<String> userIds) {
         try {
             return FlowProcessContext.getFlowProcessContext() == null ? usersMapper.selectBatchIds(userIds).stream()
-                    .map(u -> new UserDo(u.getUserId(), u.getUserName(), u.getAvatar()))
+                    .map(u -> new UserDo(u.getUserId(), u.getUserName(), u.getAvatar(),null))
                     .collect(Collectors.toList()) :
                     hrmService.selectBatchIds(userIds).stream()
-                            .map(u -> new UserDo(u.getAutoNo().toString(), u.getUserName(), u.getPersonalPhoto()))
+                            .map(u -> new UserDo(u.getAutoNo().toString(), u.getUserName(), u.getPersonalPhoto(),u.getCoNo().toString()))
                             .collect(Collectors.toList());
         } catch (Exception e) {
             return Collections.emptyList();
@@ -143,7 +138,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                             .in(WflowUserDepartments::getDeptId, deptIds))
                     .stream().map(WflowUserDepartments::getUserId)
                     .collect(Collectors.toSet()) :
-                    hrmService.selectList(deptIds);
+                    hrmService.selectByDeptIds(deptIds);
         } catch (Exception e) {
             return Collections.emptySet();
         }
@@ -194,7 +189,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
             return FlowProcessContext.getFlowProcessContext() == null? userDepartmentsMapper.selectList(null).stream()
                     .map(d -> new UserDeptDo(d.getUserId(), d.getDeptId()))
                     .collect(Collectors.toList()) :
-                    hrmService.selectList().stream()
+                    hrmService.selectByDeptIds().stream()
                             .map(d -> new UserDeptDo(d.getAutoNo().toString(), d.getDeptNo().toString()))
                             .collect(Collectors.toList());
         } catch (Exception e) {
@@ -312,16 +307,16 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                     .roles(roles.stream().map(WflowRoles::getRoleName).collect(Collectors.toList()))
                     .build();
         }
-        final HrmStaffInfo hrmStaffInfo = hrmService.selectByUserId(Long.valueOf(userId));
-        if(hrmStaffInfo==null){
+        final UserDo userDo = hrmService.selectByUserId(Long.valueOf(userId));
+        if(userDo==null){
             throw new BusinessException("员工信息不存在");
         }
         final List<DeptDo> depts = getDeptsByUser(userId);
         return  UserVo.builder()
                 .userId(userId)
-                .username(hrmStaffInfo.getUserName())
-                .sex(hrmStaffInfo.getGender() == 0)
-                .avatar(hrmStaffInfo.getPersonalPhoto())
+                .username(userDo.getUserName())
+//                .sex(userDo.getGender() == 0)
+                .avatar(userDo.getAvatar())
 //                .entryDate(hrmStaffInfo.getEntryDate())
 //                .leaveDate(hrmStaffInfo.getLeaveDate())
                 .positions(Collections.emptyList())
@@ -337,14 +332,11 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
         if(FlowProcessContext.getFlowProcessContext()==null){
             return userDepartmentsMapper.getUserDepts(userId);
         }
-        final HrmStaffInfo hrmStaffInfo = hrmService.selectByUserId(Long.valueOf(userId));
-        if(hrmStaffInfo==null){
-            throw new BusinessException("员工信息不存在");
-        }
+        final UserDo userDo = hrmService.selectByUserId(Long.valueOf(userId));
         return orgService.selectList(
                 new LambdaQueryWrapper<OrgDept>()
                         .select(OrgDept::getAutoNo,OrgDept::getName)
-                        .eq(OrgDept::getAutoNo,hrmStaffInfo.getAutoNo()
+                        .eq(OrgDept::getAutoNo,userDo.getUserId()
                 )).stream().map(d ->
                     DeptDo.builder()
                         .id(d.getAutoNo().toString())

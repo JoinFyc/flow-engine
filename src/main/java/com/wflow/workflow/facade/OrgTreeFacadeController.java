@@ -30,17 +30,15 @@ public class OrgTreeFacadeController {
 
     /**
      * 查询公司一级部门
-     * @param coNo 公司id
      * @return 组织架构树数据
      */
     @GetMapping("company")
     @Operation(summary = "查询公司一级部门")
-    public Object getOrgTreeData(@RequestParam Long coNo){
+    public Object getOrgTreeData(){
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
-        flowProcessContext.setCoNo(coNo);
         flowProcessContext.setFieldDesc("查询公司一级部门");
-        return orgRepositoryService.getDeptByCoNo(coNo);
+        return orgRepositoryService.getDeptByCoNo(Long.valueOf(flowProcessContext.getTenantId()));
     }
 
     /**

@@ -1,12 +1,19 @@
 package com.wflow.service;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.wflow.bean.do_.UserDo;
 import com.wflow.bean.entity.HrmStaffInfo;
 import com.wflow.bean.vo.OrgTreeVo;
+import com.wflow.exception.BusinessException;
 import com.wflow.mapper.HrmStaffInfoMapper;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,31 +27,78 @@ public class HrmService {
     @Resource
     private HrmStaffInfoMapper hrmStaffInfoMapper;
 
+    @Resource
+    private RestTemplate restTemplate;
+
+    @Value("${hr.request.production.url:http://localhost:32170/hr/org/v1/}")
+    private String requestUrl;
+
     public List<OrgTreeVo> selectUsersByDept(Long deptId){
-        return hrmStaffInfoMapper.selectUsersByDept(deptId);
+        ResponseEntity<List<OrgTreeVo>> exchange = restTemplate.exchange(
+                requestUrl + "selectUsersByDept",
+                HttpMethod.GET,
+                new HttpEntity<>(deptId),
+                new ParameterizedTypeReference<>() {
+                });
+        if (!exchange.getStatusCode().is2xxSuccessful() || exchange.getBody() == null) {
+            throw new BusinessException("请稍后重试，查询人事系统组织架构异常");
+        }
+        return exchange.getBody();
     }
 
     public List<OrgTreeVo> selectUsersLikeName(String userName){
-        return hrmStaffInfoMapper.selectUsersLikeName(userName);
+        ResponseEntity<List<OrgTreeVo>> exchange = restTemplate.exchange(
+                requestUrl + "selectUsersLikeName",
+                HttpMethod.GET,
+                new HttpEntity<>(userName),
+                new ParameterizedTypeReference<>() {
+                });
+        if (!exchange.getStatusCode().is2xxSuccessful() || exchange.getBody() == null) {
+            throw new BusinessException("请稍后重试，查询人事系统组织架构异常");
+        }
+        return exchange.getBody();
     }
 
-    public HrmStaffInfo selectByUserId(Long id){
-        return hrmStaffInfoMapper.selectByUserId(id);
+    public UserDo selectByUserId(Long userId){
+        ResponseEntity<UserDo> exchange = restTemplate.exchange(
+                requestUrl + "selectByUserId",
+                HttpMethod.GET,
+                new HttpEntity<>(userId),
+                new ParameterizedTypeReference<>() {
+                });
+        if (!exchange.getStatusCode().is2xxSuccessful() || exchange.getBody() == null) {
+            throw new BusinessException("请稍后重试，查询人事系统组织架构异常");
+        }
+        return exchange.getBody();
     }
 
     public List<HrmStaffInfo> selectBatchIds(Collection ids) {
-        return hrmStaffInfoMapper.selectBatchIds(ids);
+        ResponseEntity<List<HrmStaffInfo>> exchange = restTemplate.exchange(
+                requestUrl + "selectBatchIds",
+                HttpMethod.GET,
+                new HttpEntity<>(ids),
+                new ParameterizedTypeReference<>() {
+                });
+        if (!exchange.getStatusCode().is2xxSuccessful() || exchange.getBody() == null) {
+            throw new BusinessException("请稍后重试，查询人事系统组织架构异常");
+        }
+        return exchange.getBody();
     }
 
-    public Set<String> selectList(Collection<String> deptIds) {
-        return  hrmStaffInfoMapper.selectList(
-                new LambdaQueryWrapper<HrmStaffInfo>()
-                        .select(HrmStaffInfo::getAutoNo)
-                        .in(HrmStaffInfo::getDeptNo, deptIds.stream().map(Long::parseLong).collect(Collectors.toSet()))
-        ).stream().map(s -> s.getAutoNo().toString()).collect(Collectors.toSet());
+    public Set<String> selectByDeptIds(Collection<String> deptIds) {
+        ResponseEntity<List<HrmStaffInfo>> exchange = restTemplate.exchange(
+                requestUrl + "selectByDeptIds",
+                HttpMethod.GET,
+                new HttpEntity<>(deptIds),
+                new ParameterizedTypeReference<>() {
+                });
+        if (!exchange.getStatusCode().is2xxSuccessful() || exchange.getBody() == null) {
+            throw new BusinessException("请稍后重试，查询人事系统组织架构异常");
+        }
+        return  exchange.getBody().stream().map(s -> s.getUserId().toString()).collect(Collectors.toSet());
     }
 
-    public List<HrmStaffInfo> selectList() {
+    public List<HrmStaffInfo> selectByDeptIds() {
         return hrmStaffInfoMapper.selectList(null);
     }
 }

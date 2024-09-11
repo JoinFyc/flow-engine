@@ -32,6 +32,8 @@ public class ModelGroupVo {
 
         private String formId;
 
+        private String formType;
+
         private Integer version;
 
         private String processDefId;

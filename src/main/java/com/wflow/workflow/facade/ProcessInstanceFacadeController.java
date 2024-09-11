@@ -1,6 +1,8 @@
 package com.wflow.workflow.facade;
 
 import com.wflow.bean.FlowProcessContext;
+import com.wflow.bean.do_.LoginDo;
+import com.wflow.utils.RpcUtil;
 import com.wflow.utils.R;
 import com.wflow.workflow.bean.vo.ProcessHandlerParamsVo;
 import com.wflow.workflow.bean.vo.ProcessStartParamsVo;
@@ -36,10 +38,9 @@ public class ProcessInstanceFacadeController {
     @PostMapping("start")
     @Operation(summary = "发起流程")
     public Object startProcess(@RequestParam String defId,
-                               @RequestParam String userId,
                                @RequestBody ProcessStartParamsVo params) {
+
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
-        flowProcessContext.setUserId(userId);
         flowProcessContext.setFieldTag(Boolean.TRUE);
         flowProcessContext.setFieldDesc("发起流程-");
         String instanceId = processService.startProcess(defId, params);
@@ -61,7 +62,6 @@ public class ProcessInstanceFacadeController {
                                        @RequestParam(defaultValue = "1") Integer pageNo,
                                        @RequestParam(required = false) String formId,
                                        @RequestParam(required = false) String[] startTimes,
-                                       @RequestParam String userId,
                                        @RequestParam(required = false) String keyword,
                                        @RequestParam(required = false) Boolean finished,
                                        @RequestParam(required = false) String fieldId,
@@ -70,7 +70,7 @@ public class ProcessInstanceFacadeController {
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
         flowProcessContext.setFieldDesc("不取表单摘要和头像数据");
-        return R.ok(processService.getUserSubmittedList(pageSize, pageNo, userId, formId,
+        return R.ok(processService.getUserSubmittedList(pageSize, pageNo, flowProcessContext.getUserId(), formId,
                 finished, startTimes, keyword, fieldId, fieldVal));
     }
 
@@ -80,7 +80,6 @@ public class ProcessInstanceFacadeController {
      * @param pageSize 每页数量
      * @param pageNo   页码
      * @param formId     表单模型ID，流程定义KEY
-     * @param userId     用户标识
      * @return 超送我的审批实例
      */
     @GetMapping("ccMe")
@@ -88,12 +87,10 @@ public class ProcessInstanceFacadeController {
     public Object getCcMeInstance(@RequestParam(defaultValue = "20") Integer pageSize,
                                   @RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(required = false) String[] startTimes,
-                                  @RequestParam(required = false) String formId,
-                                  @RequestParam String userId
+                                  @RequestParam(required = false) String formId
     ) {
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
-        flowProcessContext.setUserId(userId);
         flowProcessContext.setFieldDesc("抄送我-不取表单摘要和头像数据");
         return R.ok(processService.getCcMeInstance(pageSize, pageNo, formId, startTimes));
     }
@@ -114,11 +111,9 @@ public class ProcessInstanceFacadeController {
                                   @RequestParam(defaultValue = "1") Integer pageNo,
                                   @RequestParam(required = false) String formId,
                                   @RequestParam(required = false) String[] startTimes,
-                                  @RequestParam String userId,
                                   @RequestParam(required = false) String keyword) {
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
-        flowProcessContext.setUserId(userId);
         flowProcessContext.setFieldDesc("我审批-不取表单摘要和头像数据");
         return R.ok(taskService.getUserTodoList(pageSize, pageNo, formId, startTimes, keyword));
     }
@@ -135,10 +130,9 @@ public class ProcessInstanceFacadeController {
      */
     @GetMapping("progress")
     @Operation(summary = "流程详情-进程")
-    public Object getProcessFormAndInstanceProgress(@RequestParam String instanceId,@RequestParam(required = false) String nodeId,@RequestParam String userId) {
+    public Object getProcessFormAndInstanceProgress(@RequestParam String instanceId,@RequestParam(required = false) String nodeId) {
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
-        flowProcessContext.setUserId(userId);
         flowProcessContext.setFieldDesc("查询审批进度-取当前用户ID判断是否允许撤销");
         return R.ok(processService.getInstanceProgress(nodeId, instanceId));
     }
@@ -152,12 +146,10 @@ public class ProcessInstanceFacadeController {
     @PostMapping("handler")
     @Operation(summary = "流程处理")
     public Object approvalTask(@RequestBody ProcessHandlerParamsVo params) {
-        String userId = params.getUserId();
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
-        flowProcessContext.setUserId(userId);
         flowProcessContext.setFieldDesc("用户处理任务，审批、转交、评论、撤销等操作");
-        taskService.approvalTask(userId, userId, params);
+        taskService.approvalTask(flowProcessContext.getUserId(), flowProcessContext.getUserId(), params);
         return R.ok("处理成功");
     }
 
@@ -166,7 +158,7 @@ public class ProcessInstanceFacadeController {
      *
      * @return 统计数据
      */
-    @GetMapping("instance/count")
+    @GetMapping("count")
     @Operation(summary = "工作台-统计")
     public Object getProcessInstanceCount() {
         return R.ok(processService.getProcessInstanceCount());

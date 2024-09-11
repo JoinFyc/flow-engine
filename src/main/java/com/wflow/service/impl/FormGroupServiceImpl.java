@@ -128,11 +128,15 @@ public class FormGroupServiceImpl implements ModelGroupService {
     @Override
     public Object getModelById(String formId) {
         WflowModels wflowModels = modelsMapper.selectById(formId);
+        WflowModelGroups group = groupsMapper.selectOne(new LambdaQueryWrapper<WflowModelGroups>()
+                .eq(WflowModelGroups::getGroupId, wflowModels.getGroupId())
+                .select(WflowModelGroups::getGroupType));
         ProcessNode<?> root = nodeCatchService.reloadProcessByStr(wflowModels.getProcess()).get("root");
         List<Form> forms = formService.filterFormByPermConfigForRoot(JSONArray.parseArray(wflowModels.getFormItems(), Form.class), (RootProps) root.getProps());
         return WflowModelDetailVo.builder()
                 .formId(formId).formItems(forms)
                 .formName(wflowModels.getFormName())
+                .groupType(group.getGroupType())
                 .logo(wflowModels.getLogo())
                 .formConfig(JSONObject.parseObject(wflowModels.getFormConfig()))
                 .processDefId(wflowModels.getProcessDefId())

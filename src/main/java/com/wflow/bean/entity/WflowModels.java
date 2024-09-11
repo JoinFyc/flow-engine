@@ -85,6 +85,10 @@ public class WflowModels implements Serializable {
      */
     private String businessEventKey;
 
+    /**
+     * 表单类型
+     */
+    private String formType;
 
 
 }

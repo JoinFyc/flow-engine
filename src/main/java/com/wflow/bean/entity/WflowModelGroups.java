@@ -28,6 +28,10 @@ public class WflowModelGroups implements Serializable {
     */
     private String groupName;
     /**
+    * 分组类型
+    */
+    private String groupType;
+    /**
     * 排序
     */
     private Integer sort;

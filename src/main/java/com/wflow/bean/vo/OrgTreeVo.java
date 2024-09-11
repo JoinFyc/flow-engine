@@ -28,4 +28,6 @@ public class OrgTreeVo {
     private Boolean sex;
     //冗余字段
     private Boolean selected;
+    //公司编号
+    private String companyId;
 }
