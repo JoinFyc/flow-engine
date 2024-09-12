@@ -27,22 +27,35 @@ public class GlobalCorsConfig {
 
     @Bean
     public FilterRegistrationBean filterRegistrationBean() {
-        final CorsConfiguration corsConfiguration = getCorsConfiguration();
+        CorsConfiguration config = new CorsConfiguration();
 
+        // 允许所有来源
+        config.addAllowedOriginPattern("*");
+
+        // 允许的 HTTP 方法
+        config.addAllowedMethod("*");
+
+        // 允许的请求头
+        config.addAllowedHeader("*");
+
+        // 允许带凭据（如 Cookies）
+        config.setAllowCredentials(true);
+
+        // 配置应用于所有路径
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
-        CorsFilter corsFilter = new CorsFilter(source);
+        source.registerCorsConfiguration("/**", config);
 
-        FilterRegistrationBean<CorsFilter> filterRegistrationBean=new FilterRegistrationBean<>(corsFilter);
-        filterRegistrationBean.setOrder(-101);
+        // 注册 CORS 过滤器
+        FilterRegistrationBean<CorsFilter> filterRegistrationBean = new FilterRegistrationBean<>(new CorsFilter(source));
+        filterRegistrationBean.setOrder(0);  // 设置过滤器的优先级，数字越小优先级越高
         return filterRegistrationBean;
     }
 
     private CorsConfiguration getCorsConfiguration() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         //1.允许任何来源
-        corsConfiguration.addAllowedOrigin(webDomain);
-        corsConfiguration.addAllowedOrigin("http://localhost:5173");
+        corsConfiguration.addAllowedOrigin("*");
+//        corsConfiguration.addAllowedOrigin("http://localhost:5173");
         corsConfiguration.addAllowedOriginPattern("*");
         //2.允许任何请求头
         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
