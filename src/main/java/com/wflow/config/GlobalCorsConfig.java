@@ -42,7 +42,7 @@ public class GlobalCorsConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         //1.允许任何来源
         corsConfiguration.addAllowedOrigin(webDomain);
-        corsConfiguration.addAllowedOrigin("http://192.168.69.32:5173");
+        corsConfiguration.addAllowedOrigin("http://localhost:5173");
         corsConfiguration.addAllowedOriginPattern("*");
         //2.允许任何请求头
         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);

@@ -139,4 +139,4 @@ sa-token:
   is-log: false
 
 web:
-  domain: http://localhost:5173
+  domain: http://192.168.68.165:5173
