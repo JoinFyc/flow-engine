@@ -136,7 +136,7 @@ public class FormGroupServiceImpl implements ModelGroupService {
         return WflowModelDetailVo.builder()
                 .formId(formId).formItems(forms)
                 .formName(wflowModels.getFormName())
-                .groupType(group.getGroupType())
+                .groupType(group == null ? null : group.getGroupType())
                 .logo(wflowModels.getLogo())
                 .formConfig(JSONObject.parseObject(wflowModels.getFormConfig()))
                 .processDefId(wflowModels.getProcessDefId())
