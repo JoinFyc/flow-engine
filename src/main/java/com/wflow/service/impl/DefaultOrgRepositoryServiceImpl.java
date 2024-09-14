@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,7 +74,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                 return userDo;
             }
         }
-        return hrmService.selectByUserId(Long.parseLong(userId));
+        return hrmService.getUserById(Long.parseLong(userId));
     }
 
     @Override
@@ -105,7 +106,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
             return FlowProcessContext.getFlowProcessContext() == null ? usersMapper.selectBatchIds(userIds).stream()
                     .map(u -> new UserDo(u.getUserId(), u.getUserName(), u.getAvatar(),null))
                     .collect(Collectors.toList()) :
-                    hrmService.selectBatchIds(userIds).stream()
+                    hrmService.getStaffInfoByIds(userIds).stream()
                             .map(u -> new UserDo(u.getAutoNo().toString(), u.getUserName(), u.getPersonalPhoto(),u.getCoNo().toString()))
                             .collect(Collectors.toList());
         } catch (Exception e) {
@@ -120,7 +121,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
             return FlowProcessContext.getFlowProcessContext() == null ? departsMapper.selectBatchIds(deptIds).stream()
                     .map(u -> new DeptDo(u.getId(), u.getDeptName(), u.getLeader(), u.getParentId()))
                     .collect(Collectors.toList()) :
-                    orgService.selectBatchIds(deptIds).stream()
+                    orgService.getDepartmentsByIds(deptIds).stream()
                             .map(u -> new DeptDo(u.getAutoNo().toString(), u.getName(), u.getResponsibleId() == null ? "" : u.getResponsibleId().toString(), u.getParentDeptId() == null ? "": u.getParentDeptId().toString()))
                             .collect(Collectors.toList());
         } catch (Exception e) {
@@ -155,8 +156,9 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                 return deptDo;
             }
         }
-        final OrgDept orgDept = orgService.selectById(Long.valueOf(deptId));
-        if (Objects.nonNull(orgDept)) {
+        final List<OrgDept> departments = orgService.getDepartmentsByIds(Collections.singletonList(deptId));
+        if (!CollectionUtils.isEmpty(departments)) {
+            OrgDept orgDept = departments.get(0);
             DeptDo deptDo = new DeptDo();
             deptDo.setId(orgDept.getAutoNo().toString());
             deptDo.setDeptName(orgDept.getName());
@@ -200,9 +202,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<OrgTreeVo> getDeptByCoNo(Long coNo) {
-        return  orgService.selectList(new LambdaQueryWrapper<OrgDept>()
-                                .select(OrgDept::getAutoNo, OrgDept::getName)
-                                .eq(OrgDept::getCoNo, coNo))
+        return  orgService.getDepartmentsByIds(null)
                         .stream().map(v -> OrgTreeVo.builder().id(v.getAutoNo().toString())
                                 .name(v.getName())
                                 .type("dept").build())
@@ -212,19 +212,20 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<OrgTreeVo> getSubDeptById(String parentId) {
-        return FlowProcessContext.getFlowProcessContext() == null?
-                departsMapper.selectList(new LambdaQueryWrapper<WflowDepartments>()
-                .select(WflowDepartments::getId, WflowDepartments::getDeptName)
-                .eq(WflowDepartments::getParentId, parentId))
-                .stream().map(v -> OrgTreeVo.builder().id(v.getId())
-                        .name(v.getDeptName())
-                        .type("dept").build())
-                .collect(Collectors.toList())
-                :
-                orgService.selectList(new LambdaQueryWrapper<OrgDept>()
-                                .select(OrgDept::getAutoNo, OrgDept::getName)
-                                .eq(OrgDept::getParentDeptId, parentId))
-                        .stream().map(v -> OrgTreeVo.builder().id(v.getAutoNo().toString())
+
+        if(FlowProcessContext.getFlowProcessContext() == null) {
+            return departsMapper.selectList(new LambdaQueryWrapper<WflowDepartments>()
+            .select(WflowDepartments::getId, WflowDepartments::getDeptName)
+            .eq(WflowDepartments::getParentId, parentId))
+            .stream().map(v -> OrgTreeVo.builder().id(v.getId())
+                    .name(v.getDeptName())
+                    .type("dept").build())
+            .collect(Collectors.toList());
+
+        }
+        List<OrgDept> depts =  orgService.getChildDeptId(parentId);
+        if(CollectionUtils.isEmpty(depts)) {return null;}
+        return depts.stream().map(v -> OrgTreeVo.builder().id(v.getAutoNo().toString())
                                 .name(v.getName())
                                 .type("dept").build())
                         .collect(Collectors.toList());
@@ -251,9 +252,10 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
             subDepts.addAll(departments.stream().map(WflowDepartments::getId).collect(Collectors.toList()));
             departments.forEach(d -> loadSubDept(d.getId(), subDepts));
         }else {
-            List<OrgDept> departments = orgService.selectList(
-                    new LambdaQueryWrapper<OrgDept>()
-                            .eq(OrgDept::getParentDeptId, Long.valueOf(parentId)));
+//            List<OrgDept> departments = orgService.selectList(
+//                    new LambdaQueryWrapper<OrgDept>()
+//                            .eq(OrgDept::getParentDeptId, Long.valueOf(parentId)));
+            List<OrgDept> departments = orgService.getChildDeptId(parentId);
             subDepts.addAll(departments.stream().map(d -> d.getAutoNo().toString()).collect(Collectors.toList()));
             departments.forEach(d -> loadSubDept(d.getAutoNo().toString(), subDepts));
         }
@@ -307,7 +309,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                     .roles(roles.stream().map(WflowRoles::getRoleName).collect(Collectors.toList()))
                     .build();
         }
-        final UserDo userDo = hrmService.selectByUserId(Long.valueOf(userId));
+        final UserDo userDo = hrmService.getUserById(Long.valueOf(userId));
         if(userDo==null){
             throw new BusinessException("员工信息不存在");
         }
@@ -332,7 +334,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
         if(FlowProcessContext.getFlowProcessContext()==null){
             return userDepartmentsMapper.getUserDepts(userId);
         }
-        final UserDo userDo = hrmService.selectByUserId(Long.valueOf(userId));
+        final UserDo userDo = hrmService.getUserById(Long.valueOf(userId));
         return orgService.selectList(
                 new LambdaQueryWrapper<OrgDept>()
                         .select(OrgDept::getAutoNo,OrgDept::getName)

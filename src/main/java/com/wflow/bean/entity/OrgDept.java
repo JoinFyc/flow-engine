@@ -20,7 +20,6 @@ public class OrgDept implements Serializable {
     /**
      * bigint(20) UNSIGNED  部门ID
      */
-    @TableId(type = IdType.ASSIGN_ID)
     private Long autoNo;
     /**
      * varchar(50)  部门名称

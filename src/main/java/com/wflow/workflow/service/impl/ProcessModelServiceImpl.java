@@ -75,9 +75,7 @@ public class ProcessModelServiceImpl implements ProcessModelService {
     @Override
     @Transactional
     public String saveProcess(WflowModelHistorys models) {
-
         //TODO business_event_key校验
-
         //提取摘要字段，进行保存
         models.setFormAbstracts(JSON.toJSONString(loadFormAbstracts(models.getFormItems())));
         if (ObjectUtil.isNull(models.getFormId())) {
@@ -183,7 +181,7 @@ public class ProcessModelServiceImpl implements ProcessModelService {
                 .deployId(deploy.getId())
                 .processDefId(processDefinition.getId())
                 .id(wflowModels.getId()).build());
-        //解析配置的权限，进行拆分
+        //解析配置的权限，进行拆分 TODO 表单的权限控制
         reloadModelsPerm(code, processNode);
         //部署流程就是从历史表提取最新的流程
         log.info("部署流程{}成功，ID={}:", code, deploy.getId());

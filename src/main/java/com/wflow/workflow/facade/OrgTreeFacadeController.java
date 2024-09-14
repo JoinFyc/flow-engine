@@ -4,13 +4,11 @@ import cn.hutool.core.util.StrUtil;
 import com.wflow.bean.FlowProcessContext;
 import com.wflow.service.OrgRepositoryService;
 import com.wflow.service.OrgUserAndDeptService;
+import com.wflow.workflow.bean.vo.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author JoinFyc
@@ -59,16 +57,16 @@ public class OrgTreeFacadeController {
 
     /**
      * 模糊搜索用户
-     * @param userName 用户名/拼音/首字母
+     * @param dto 用户名/拼音/首字母
      * @return 匹配到的用户
      */
-    @GetMapping("tree/user/search")
+    @PostMapping("tree/user/search")
     @Operation(summary = "模糊搜索用户")
-    public Object getOrgTreeUser(@RequestParam String userName){
-        if(StrUtil.isEmpty(userName)) return "用户名不能为空";
+    public Object getOrgTreeUser(@RequestBody UserDTO dto){
+        if(StrUtil.isEmpty(dto.getUserName())) return "用户名不能为空";
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
         flowProcessContext.setFieldTag(Boolean.TRUE);
         flowProcessContext.setFieldDesc("查询组织架构树-模糊搜索用户");
-        return orgService.getOrgTreeUser(userName.trim());
+        return orgService.getOrgTreeUser(dto.getUserName().trim());
     }
 }

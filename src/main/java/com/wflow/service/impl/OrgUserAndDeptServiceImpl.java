@@ -19,6 +19,7 @@ import com.wflow.utils.UserUtil;
 import com.wflow.workflow.bean.process.OrgUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,10 +53,17 @@ public class OrgUserAndDeptServiceImpl implements OrgUserAndDeptService {
                     .map(r -> OrgTreeVo.builder().id(r.getRoleId()).type("role")
                             .name(r.getRoleName()).build());
         } else {
-            List<OrgTreeVo> orgs = new LinkedList<>(orgRepositoryService.getSubDeptById(deptId));
+            //查询当前部门信息
             DeptDo department = orgRepositoryService.getDeptById(deptId);
+            if(department == null){return R.ok(null);}
+            //查询子部门信息
+            List<OrgTreeVo> subDeptById = orgRepositoryService.getSubDeptById(deptId);
+            if(CollectionUtils.isEmpty(subDeptById)){return R.ok(null);}
+            List<OrgTreeVo> orgs = new LinkedList<>(subDeptById);
             if ("user".equals(type) || "org".equals(type)) {
-                orgs.addAll(orgRepositoryService.selectUsersByDept(deptId).stream().peek(u -> {
+                List<OrgTreeVo> orgTreeVos = orgRepositoryService.selectUsersByDept(deptId);
+                if(CollectionUtils.isEmpty(orgTreeVos)){return R.ok(null);}
+                orgs.addAll(orgTreeVos.stream().peek(u -> {
                     u.setIsLeader(StrUtil.isNotBlank(department.getLeader()) && department.getLeader().equals(u.getId()));
                 }).sorted(Comparator.comparing(OrgTreeVo::getIsLeader).reversed()).collect(Collectors.toList()));
             }

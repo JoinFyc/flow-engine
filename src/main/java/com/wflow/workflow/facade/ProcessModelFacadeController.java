@@ -39,6 +39,7 @@ public class ProcessModelFacadeController {
     public Object saveProcess(@RequestBody FlowModelSnapshotRequest models) {
         final WflowModelHistorys modelHistory = new WflowModelHistorys();
         BeanUtils.copyProperties(models, modelHistory);
+        modelHistory.setGroupId(Long.valueOf(models.getGroupId()));
         return R.ok(modelService.saveProcess(modelHistory));
     }
 
