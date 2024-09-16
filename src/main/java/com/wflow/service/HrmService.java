@@ -90,10 +90,10 @@ public class HrmService {
         ResponseEntity<String> exchange = restTemplate.exchange(
                 requestUrl + "getStaffInfoByIds",
                 HttpMethod.POST,
-                new HttpEntity<>(OrgDto.builder().deptIds(new HashSet<>(ids)),headers),
+                new HttpEntity<>(OrgDto.builder().deptIds(new HashSet<>(ids)).build(),headers),
                 new ParameterizedTypeReference<>() {
                 });
-        if (!exchange.getStatusCode().is2xxSuccessful()) {
+        if (!exchange.getStatusCode().is2xxSuccessful() || exchange.getBody() == null) {
             throw new BusinessException("请稍后重试，查询人事系统组织架构异常");
         }
         return JSONArray.parseArray(exchange.getBody(), HrmStaffInfo.class);

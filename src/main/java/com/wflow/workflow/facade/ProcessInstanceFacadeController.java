@@ -1,8 +1,6 @@
 package com.wflow.workflow.facade;
 
 import com.wflow.bean.FlowProcessContext;
-import com.wflow.bean.do_.LoginDo;
-import com.wflow.utils.RpcUtil;
 import com.wflow.utils.R;
 import com.wflow.workflow.bean.vo.ProcessHandlerParamsVo;
 import com.wflow.workflow.bean.vo.ProcessStartParamsVo;
@@ -153,6 +151,7 @@ public class ProcessInstanceFacadeController {
         return R.ok("处理成功");
     }
 
+
     /**
      * 查询工作台上方 我发起的、带我处理、关于我的统计数量
      *
@@ -161,6 +160,9 @@ public class ProcessInstanceFacadeController {
     @GetMapping("count")
     @Operation(summary = "工作台-统计")
     public Object getProcessInstanceCount() {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("查询流程模型数据");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
         return R.ok(processService.getProcessInstanceCount());
     }
 

@@ -58,6 +58,7 @@ public class UserDeptOrLeaderServiceImpl implements UserDeptOrLeaderService {
      */
     @Override
     public boolean userIsBelongToDept(String userId, String deptId) {
+//        TODO 校验用户是否在某部门下
         Set<String> set = orgOwnershipService.getUserDepts(userId);
         return CollectionUtil.isNotEmpty(set) && set.contains(deptId);
     }
@@ -71,6 +72,7 @@ public class UserDeptOrLeaderServiceImpl implements UserDeptOrLeaderService {
      */
     @Override
     public boolean deptIsBelongToDept(String deptId, String parentDeptId) {
+//        TODO 校验部门是否属于某部门的子部门
         Set<String> set = orgOwnershipService.getDeptDepts(deptId);
         return CollectionUtil.isNotEmpty(set) && set.contains(parentDeptId);
     }

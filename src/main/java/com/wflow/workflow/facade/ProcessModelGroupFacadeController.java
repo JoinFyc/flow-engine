@@ -1,8 +1,10 @@
 package com.wflow.workflow.facade;
 
+import com.wflow.bean.FlowProcessContext;
 import com.wflow.bean.vo.remote.req.FlowModelGroupRequest;
 import com.wflow.service.ModelGroupService;
 import com.wflow.utils.R;
+import com.wflow.utils.UserUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -29,6 +31,9 @@ public class ProcessModelGroupFacadeController {
     @GetMapping("list")
     @Operation(summary = "流程模型分组")
     public Object getModelGroups() {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("流程模型分组");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
         return R.ok(modelGroupService.getModelGroups());
     }
 
@@ -41,6 +46,9 @@ public class ProcessModelGroupFacadeController {
     @PostMapping("add")
     @Operation(summary = "创建模型分组")
     public Object createModelGroup(@RequestBody FlowModelGroupRequest request) {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("创建模型分组");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
         modelGroupService.createModelGroup(request);
         return R.ok("新增分组成功");
     }
@@ -54,8 +62,24 @@ public class ProcessModelGroupFacadeController {
     @PostMapping("del")
     @Operation(summary = "删除模型分组")
     public Object deleteModelGroup(@RequestParam Long groupId) {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("删除模型分组");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
         modelGroupService.deleteByGroupId(groupId);
         return R.ok("删除分组成功");
+    }
+
+    /**
+     * 获取用户可见的流程列表
+     * @param modelName 流程模型名筛选
+     * @return 列表数据
+     */
+    @GetMapping("list/byUser")
+    public Object getUserModels(@RequestParam(required = false) String modelName) {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("获取用户可见的流程列表");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
+        return R.ok(modelGroupService.getGroupModels(flowProcessContext.getUserId(), modelName));
     }
 
 }

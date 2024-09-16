@@ -5,6 +5,7 @@ import com.wflow.bean.entity.WflowModelHistorys;
 import com.wflow.bean.vo.remote.req.FlowModelSnapshotRequest;
 import com.wflow.service.ModelGroupService;
 import com.wflow.utils.R;
+import com.wflow.utils.UserUtil;
 import com.wflow.workflow.service.ProcessModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +38,9 @@ public class ProcessModelFacadeController {
     @PostMapping("save")
     @Operation(summary = "保存流程")
     public Object saveProcess(@RequestBody FlowModelSnapshotRequest models) {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("保存流程");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
         final WflowModelHistorys modelHistory = new WflowModelHistorys();
         BeanUtils.copyProperties(models, modelHistory);
         modelHistory.setGroupId(Long.valueOf(models.getGroupId()));
@@ -52,6 +56,9 @@ public class ProcessModelFacadeController {
     @PostMapping("deploy")
     @Operation(summary = "发布流程")
     public Object deployModel(@RequestParam String formId) {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("发布流程");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
         modelService.deployProcess(formId);
         return R.ok("部署流程成功");
     }
@@ -63,7 +70,7 @@ public class ProcessModelFacadeController {
     @Operation(summary = "查询所有分组流程模型数据")
     public Object getGroupModels() {
         final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
-        flowProcessContext.setFieldDesc("不查询默认与停用分组");
+        flowProcessContext.setFieldDesc("查询所有分组流程模型数据");
         flowProcessContext.setFieldTag(Boolean.TRUE);
         return R.ok(modelGroupService.getGroupModels(null, null));
     }
@@ -75,7 +82,22 @@ public class ProcessModelFacadeController {
     @GetMapping("detail")
     @Operation(summary = "查询流程模型数据")
     public Object getModelById(@RequestParam String formId) {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("查询流程模型数据");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
         return R.ok(modelGroupService.getModelById(formId));
+    }
+    /**
+     * 通过流程模型ID（流程定义KEY）查询流程模型数据
+     * @param code 流程模型ID（流程定义KEY）
+     * @return 流程表单详情数据
+     */
+    @GetMapping("def")
+    public Object getProcessModelByCode(@RequestParam String code){
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("通过流程模型ID（流程定义KEY）查询流程模型数据");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
+        return R.ok(modelService.getLastVersionModel(code));
     }
 
 }

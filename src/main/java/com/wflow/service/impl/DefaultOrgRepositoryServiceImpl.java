@@ -102,16 +102,13 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<UserDo> getUsersBatch(Collection<String> userIds) {
-        try {
             return FlowProcessContext.getFlowProcessContext() == null ? usersMapper.selectBatchIds(userIds).stream()
                     .map(u -> new UserDo(u.getUserId(), u.getUserName(), u.getAvatar(),null))
                     .collect(Collectors.toList()) :
                     hrmService.getStaffInfoByIds(userIds).stream()
                             .map(u -> new UserDo(u.getAutoNo().toString(), u.getUserName(), u.getPersonalPhoto(),u.getCoNo().toString()))
                             .collect(Collectors.toList());
-        } catch (Exception e) {
-            return Collections.emptyList();
-        }
+
     }
 
     @Override

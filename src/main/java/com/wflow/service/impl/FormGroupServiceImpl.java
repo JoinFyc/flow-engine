@@ -63,6 +63,7 @@ public class FormGroupServiceImpl implements ModelGroupService {
         //一次性查出所有表单，再分组归类
         Map<Long, List<ModelGroupVo.Form>> groupMap = new LinkedHashMap<>();
         List<ModelGroupVo.Form> models = Objects.nonNull(userId) ?
+//                TODO 用户可见的流程
                 orgRepositoryService.getModelsByPerm(userId) :
                 modelsMapper.getSysModels();
         final FlowProcessContext flowProcessContext = FlowProcessContext.getFlowProcessContext();
@@ -127,7 +128,8 @@ public class FormGroupServiceImpl implements ModelGroupService {
 
     @Override
     public Object getModelById(String formId) {
-        WflowModels wflowModels = modelsMapper.selectById(formId);
+        WflowModels wflowModels = modelsMapper.selectOne(new LambdaQueryWrapper<WflowModels>()
+                .eq(WflowModels::getFormId,formId));
         WflowModelGroups group = groupsMapper.selectOne(new LambdaQueryWrapper<WflowModelGroups>()
                 .eq(WflowModelGroups::getGroupId, wflowModels.getGroupId())
                 .select(WflowModelGroups::getGroupType));

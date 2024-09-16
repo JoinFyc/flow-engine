@@ -55,6 +55,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.SystemUtils.getUserName;
+
 /**
  * @author : willian fu
  * @date : 2022/8/23
@@ -120,7 +122,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             throw new BusinessException("流程未启用，请先启用");
         }
         //设置发起的人员及部门信息
-        String userId = UserUtil.getLoginUserId();
+        String userId = getUserId();
         //设置发起人部门ID，此处减小流程变量表数据改成只放ID
         processVar.put(WflowGlobalVarDef.START_DEPT, params.getDeptId());
         WflowModels wflowModels = modelsMapper.selectOne(new LambdaQueryWrapper<WflowModels>().eq(WflowModels::getProcessDefId, defId));
@@ -138,7 +140,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             processVar.put(WflowGlobalVarDef.LAST_AUDIT_EVENT_TAG,lastNode.getProps());
         }
         //构造流程实例名称
-        String instanceName = orgRepositoryService.getUserById(userId).getUserName() + "发起的" + processDefinition.getName();
+        final UserDo user = orgRepositoryService.getUserById(userId);
+        if(user == null){throw new BusinessException("用户不存在"); }
+        String instanceName = user.getUserName() + "发起的" + processDefinition.getName();
         //这样做貌似无效果，变量表不会多INITIATOR变量，但是流程表发起人有效
         //TODO 流程开启 start
         Authentication.setAuthenticatedUserId(userId);
@@ -479,7 +483,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public Page<ProcessInstanceVo> getCcMeInstance(Integer pageSize, Integer pageNo, String code, String[] startTimes) {
         LambdaQueryWrapper<WflowCcTasks> queryWrapper = new LambdaQueryWrapper<WflowCcTasks>()
-                .eq(WflowCcTasks::getUserId, UserUtil.getLoginUserId());
+                .eq(WflowCcTasks::getUserId, this.getUserId());
         HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery();
         Executor.builder()
                 .ifNotBlankNext(code, v -> queryWrapper.eq(WflowCcTasks::getCode, code))
@@ -508,6 +512,13 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             page.setRecords(Collections.emptyList());
         }
         return page;
+    }
+
+    /**
+     * 获取用户ID
+     */
+    protected static String getUserId() {
+        return FlowProcessContext.getFlowProcessContext() == null ? UserUtil.getLoginUserId() : FlowProcessContext.getFlowProcessContext().getUserId();
     }
 
     @Override
