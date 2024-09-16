@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  * @date 2024-08-29
  */
 @RestController
-@RequestMapping("/process/task")
+@RequestMapping("/flow-engine/rest/process/task")
 public class ProcessInstanceTaskFacadeController {
 
     @Autowired
