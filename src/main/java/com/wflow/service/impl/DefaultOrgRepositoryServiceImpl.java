@@ -106,7 +106,7 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                     .map(u -> new UserDo(u.getUserId(), u.getUserName(), u.getAvatar(),null))
                     .collect(Collectors.toList()) :
                     hrmService.getStaffInfoByIds(userIds).stream()
-                            .map(u -> new UserDo(u.getAutoNo().toString(), u.getUserName(), u.getPersonalPhoto(),u.getCoNo().toString()))
+                            .map(u -> new UserDo(u.getAutoNo().toString(), u.getStaffName(), u.getPersonalPhoto(),u.getCoNo().toString()))
                             .collect(Collectors.toList());
 
     }
