@@ -28,6 +28,8 @@ spring:
 #          password: Fanxin@Sbz123!@#
 #          driverClassName: com.mysql.jdbc.Driver
 
+
+
   #  http:
 #    encoding:
 #      charset: UTF-8
@@ -145,3 +147,9 @@ sa-token:
 
 web:
   domain: http://192.168.68.165:5173
+
+#HR服务地址
+hr:
+  request:
+    production:
+      url: http://localhost:32170/hr/org/v1/

@@ -17,11 +17,11 @@ spring:
           username: fanxin_pm_master
           password: Fanxin@Sbz123!@#
           driverClassName: com.mysql.jdbc.Driver
-        hr:
-          url: jdbc:mysql://cuslter-pm-2023.rwlb.zhangbei.rds.aliyuncs.com:3306/hr?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&tinyInt1isBit=false
-          username: fanxin_pm_master
-          password: Fanxin@Sbz123!@#
-          driverClassName: com.mysql.jdbc.Driver
+#        hr:
+#          url: jdbc:mysql://cuslter-pm-2023.rwlb.zhangbei.rds.aliyuncs.com:3306/hr?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&tinyInt1isBit=false
+#          username: fanxin_pm_master
+#          password: Fanxin@Sbz123!@#
+#          driverClassName: com.mysql.jdbc.Driver
 
   #  http:
 #    encoding:
@@ -140,3 +140,9 @@ sa-token:
 
 web:
   domain: http://192.168.68.165:5173
+
+#HR服务地址
+hr:
+  request:
+    production:
+      url: http://192.168.70.128:32170/hr/org/v1/
