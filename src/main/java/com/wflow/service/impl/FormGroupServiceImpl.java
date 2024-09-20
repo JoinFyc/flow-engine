@@ -143,6 +143,7 @@ public class FormGroupServiceImpl implements ModelGroupService {
                 .formConfig(JSONObject.parseObject(wflowModels.getFormConfig()))
                 .processDefId(wflowModels.getProcessDefId())
                 .process(root)
+                .formType(wflowModels.getFormType())
                 .build();
     }
 

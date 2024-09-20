@@ -152,4 +152,5 @@ web:
 hr:
   request:
     production:
-      url: http://localhost:32170/hr/org/v1/
+#      url: http://localhost:32170/hr/org/v1/
+      url: http://192.168.70.128:32170/hr/org/v1/

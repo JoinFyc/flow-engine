@@ -48,4 +48,8 @@ public class WflowModelDetailVo {
      * 流程设置内容
      */
     private ProcessNode<?> process;
+    /**
+     * 表单类型
+     */
+    private String formType;
 }
