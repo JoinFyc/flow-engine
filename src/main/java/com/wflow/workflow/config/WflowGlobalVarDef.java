@@ -52,6 +52,9 @@ public class WflowGlobalVarDef {
     //流程发起人变量
     public static final String INITIATOR = "initiator";
 
+    //流程唯一ID
+    public static final String FLOW_UNIQUE_ID = "flow_unique_id";
+
     //模板变量替换正则编译
     public static final Pattern TEMPLATE_REPLACE_REG = Pattern.compile("\\$\\{(.+?)\\}");
 

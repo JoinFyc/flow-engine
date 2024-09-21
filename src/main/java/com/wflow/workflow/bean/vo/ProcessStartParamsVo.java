@@ -20,4 +20,7 @@ public class ProcessStartParamsVo {
 
     //流程节点ID -> 流程选择的人员
     private Map<String, List<OrgUser>> processUsers;
+
+    //流程唯一业务ID
+    private String flowUniqueId;
 }

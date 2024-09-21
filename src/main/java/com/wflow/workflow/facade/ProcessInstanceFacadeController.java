@@ -42,7 +42,7 @@ public class ProcessInstanceFacadeController {
         flowProcessContext.setFieldTag(Boolean.TRUE);
         flowProcessContext.setFieldDesc("发起流程-");
         String instanceId = processService.startProcess(defId, params);
-        return R.ok("启动流程实例 " + instanceId + " 成功");
+        return R.ok(instanceId);
     }
 
     /**

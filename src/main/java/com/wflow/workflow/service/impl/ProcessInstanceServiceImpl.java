@@ -133,6 +133,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         processVar.put(WflowGlobalVarDef.WFLOW_NODE_PROPS, propsMap);
         processVar.put(WflowGlobalVarDef.WFLOW_FORMS, JSONArray.parseArray(wflowModels.getFormItems(), Form.class));
         processVar.put(WflowGlobalVarDef.INITIATOR, userId);
+        processVar.put(WflowGlobalVarDef.FLOW_UNIQUE_ID, params.getFlowUniqueId());
         //最终审批人的事件Key
         if(StrUtil.isNotBlank(wflowModels.getBusinessEventKey())) {
             final ProcessNode<?> lastNode = Objects.requireNonNull(nodeMap.entrySet().stream().reduce((first, second) -> second).orElse(null)).getValue();
@@ -184,6 +185,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public ProcessProgressVo getInstanceProgress(String nodeId, String instanceId) {
+        //构建处理参数
+        final ProcessProgressVo.ProcessProgressVoBuilder builder = ProcessProgressVo.builder();
+        Map<String, Object> ruVariables = runtimeService.getVariables(instanceId);
+        String flowUniqueId = (String)ruVariables.get(WflowGlobalVarDef.FLOW_UNIQUE_ID);
+        builder.flowUniqueId(flowUniqueId);
         //先查实例，然后判断是子流程还是主流程
         HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(instanceId).singleResult();
@@ -303,7 +309,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             externSetting = getExternSetting(modelHistory.getSettings(), instance.getStartUserId());
         }
         ProcessResultEnum processResult = ProcessResultEnum.resolveResult(instance.getEndActivityId());
-        return ProcessProgressVo.builder()
+        return builder
                 .instanceId(instanceId)
                 .version(instance.getProcessDefinitionVersion())
                 .formItems(formItems)
@@ -448,6 +454,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public Page<ProcessInstanceVo> getUserSubmittedList(Integer pageSize, Integer pageNo, String startUser, String code,
                                                         Boolean finished, String[] startTimes, String keyword, String fieldId, String fieldVal) {
+
         HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery();
         Executor.builder()
                 .ifNotBlankNext(startUser, instanceQuery::startedBy)

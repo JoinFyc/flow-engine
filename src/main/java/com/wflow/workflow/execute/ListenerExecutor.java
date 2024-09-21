@@ -75,6 +75,7 @@ public class ListenerExecutor {
             return; //过滤其他非必要节点
         }
         try {
+//            todo 获取流程实例变量
             Map<String, Object> contextVar = uelTools.getContextVar(instanceId, defId);
             Map map = (Map) contextVar.get(WflowGlobalVarDef.WFLOW_NODE_PROPS);
             Object nodeProps = map.get(nodeId);

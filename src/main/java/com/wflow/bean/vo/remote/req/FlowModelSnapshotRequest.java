@@ -48,4 +48,7 @@ public class FlowModelSnapshotRequest {
 
     @Schema(description = "业务流程")
     private String businessEventKey;
+
+    @Schema(description = "表单类型")
+    private String formType;
 }

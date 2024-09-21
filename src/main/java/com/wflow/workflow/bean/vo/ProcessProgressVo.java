@@ -25,6 +25,9 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProcessProgressVo {
+
+    //流程唯一业务ID
+    private String flowUniqueId;
     //审批实例ID
     private String instanceId;
     //表单配置项

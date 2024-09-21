@@ -5,7 +5,7 @@ import com.wflow.bean.entity.WflowModelHistorys;
 import com.wflow.bean.vo.remote.req.FlowModelSnapshotRequest;
 import com.wflow.service.ModelGroupService;
 import com.wflow.utils.R;
-import com.wflow.utils.UserUtil;
+import com.wflow.workflow.bean.vo.FormGroupVo;
 import com.wflow.workflow.service.ProcessModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -98,6 +98,51 @@ public class ProcessModelFacadeController {
         flowProcessContext.setFieldDesc("通过流程模型ID（流程定义KEY）查询流程模型数据");
         flowProcessContext.setFieldTag(Boolean.TRUE);
         return R.ok(modelService.getLastVersionModel(code));
+    }
+
+    /**
+     * 停用流程成功 & 启用流程成功
+     * @param modelId 流程模型ID
+     * @param type 类型
+     * @return 启用停用成功
+     */
+    @PutMapping("{modelId}/active/{type}")
+    public Object enOrDisModel(@PathVariable String modelId,
+                               @PathVariable Boolean type) {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("停用流程成功 & 启用流程成功");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
+        modelGroupService.enOrDisModel(modelId, type);
+        return R.ok(Boolean.TRUE.equals(type) ? "停用流程成功":"启用流程成功");
+    }
+
+    /**
+     * 删除已部署的流程模型
+     * @param formId 流程定义ID
+     * @return 删除结果
+     */
+    @DeleteMapping("{formId}")
+    public Object delProcessModel(@PathVariable String formId){
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("删除已部署的流程模型");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
+        modelService.delProcess(formId);
+        return R.ok("删除流程成功");
+    }
+
+    /**
+     * 表单分组排序
+     *
+     * @param formGroup 分组数据
+     * @return 排序结果
+     */
+    @PostMapping("group/sort")
+    public Object modelGroupsSort(@RequestBody FormGroupVo formGroup) {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.initFlowProcessContext();
+        flowProcessContext.setFieldDesc("表单分组排序");
+        flowProcessContext.setFieldTag(Boolean.TRUE);
+        modelGroupService.modelGroupsSort(formGroup.getGroups());
+        return R.ok("分组排序成功");
     }
 
 }
