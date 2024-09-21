@@ -19,6 +19,9 @@ public class FlowModelGroupRequest {
     @Schema(description = "表单分组名称", requiredMode = Schema.RequiredMode.REQUIRED)
     private String groupName;
 
+    @Schema(description = "表单分组类型", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String groupType;
+
     @Schema(description = "排序")
     private Integer sort;
 

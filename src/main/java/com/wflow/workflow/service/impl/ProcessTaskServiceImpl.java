@@ -800,7 +800,8 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
         //存最近一个审批节点的处理结果
         var.put(WflowGlobalVarDef.PREVIOUS_AP_NODE, task.getTaskDefinitionKey() + ":" + params.getAction());
 
-        //最后一个审批人,审批通过
+//        TODO 检查并行或复杂分支条件下最后一个审批人获取的情况是否有BUG
+        //最后一个审批人,审批通过。
         ApprovalProps props = JSON.parseObject(
                 JSON.toJSONString(runtimeService.getVariable(task.getExecutionId(), WflowGlobalVarDef.LAST_AUDIT_EVENT_TAG)),
                 ApprovalProps.class

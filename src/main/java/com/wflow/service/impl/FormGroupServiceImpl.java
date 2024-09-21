@@ -179,6 +179,7 @@ public class FormGroupServiceImpl implements ModelGroupService {
         groupsMapper.insert(
                 WflowModelGroups.builder()
                         .groupName(request.getGroupName())
+                        .groupType(request.getGroupType())
                         .created(new Date())
                         .status(1)
                         .sort(request.getSort())
