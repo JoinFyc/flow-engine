@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * @author : willian fu
- * @date : 2022/8/28
+ * @author : JoinFyc
+ * @date : 2024/8/28
  */
 @Data
 @Builder

@@ -11,8 +11,8 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 /**
- * @author : willian fu
- * @date : 2022/11/29
+ * @author : JoinFyc
+ * @date : 2024/08/29
  */
 public interface WflowModelPermsMapper extends BaseMapper<WflowModelPerms> {
 

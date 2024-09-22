@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * 用户详细信息实体，没有的可以不填
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2024/1/15
  */
 @Data

@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 /**
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2023/11/27
  */
 public interface WflowSubProcessMapper extends BaseMapper<WflowSubProcess> {

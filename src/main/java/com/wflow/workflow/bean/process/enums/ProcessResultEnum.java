@@ -6,7 +6,7 @@ import java.util.Objects;
 
 /**
  * 流程审批结果状态枚举
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2023/8/16
  */
 public enum ProcessResultEnum {

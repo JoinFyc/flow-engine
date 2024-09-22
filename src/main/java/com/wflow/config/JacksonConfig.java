@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 
 /**
- * @author : willian fu
+ * @author : JoinFyc
  * @since : 2024/5/13
  */
 @Configuration

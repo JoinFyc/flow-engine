@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * 用户及部门基本信息
- * @author : willian fu
- * @date : 2022/11/29
+ * @author : JoinFyc
+ * @date : 2024/08/29
  */
 @Data
 @AllArgsConstructor

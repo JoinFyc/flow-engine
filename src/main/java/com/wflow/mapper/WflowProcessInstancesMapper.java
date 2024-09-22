@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wflow.bean.entity.WflowProcessInstances;
 
 /**
- * @author : willian fu
- * @date : 2022/8/24
+ * @author : JoinFyc
+ * @date : 2024/8/24
  */
 public interface WflowProcessInstancesMapper extends BaseMapper<WflowProcessInstances> {
 }

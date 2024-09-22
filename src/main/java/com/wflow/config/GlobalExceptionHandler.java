@@ -16,8 +16,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.Objects;
 
 /**
- * @author : willian fu
- * @date : 2022/6/27
+ * @author : JoinFyc
+ * @date : 2024/6/27
  */
 @Slf4j
 @Component

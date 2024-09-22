@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 
 /**
  * 默认wflow的实现，集成自有系统需要自行实现接口
- * @author : willian fu
- * @date : 2022/11/29
+ * @author : JoinFyc
+ * @date : 2024/08/29
  */
 @Service
 public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
@@ -153,15 +153,17 @@ public class DefaultOrgRepositoryServiceImpl implements OrgRepositoryService {
                 return deptDo;
             }
         }
-        final List<OrgDept> departments = orgService.getDepartmentsByIds(Collections.singletonList(deptId));
-        if (!CollectionUtils.isEmpty(departments)) {
-            OrgDept orgDept = departments.get(0);
-            DeptDo deptDo = new DeptDo();
-            deptDo.setId(orgDept.getAutoNo().toString());
-            deptDo.setDeptName(orgDept.getName());
-            deptDo.setLeader(orgDept.getResponsibleId() == null ? "" : orgDept.getResponsibleId().toString());
-            deptDo.setParentId(orgDept.getParentDeptId() == null ? "" : orgDept.getParentDeptId().toString());
-            return deptDo;
+        if(FlowProcessContext.getFlowProcessContext() != null) {
+            final List<OrgDept> departments = orgService.getDepartmentsByIds(Collections.singletonList(deptId));
+            if (!CollectionUtils.isEmpty(departments)) {
+                OrgDept orgDept = departments.get(0);
+                DeptDo deptDo = new DeptDo();
+                deptDo.setId(orgDept.getAutoNo().toString());
+                deptDo.setDeptName(orgDept.getName());
+                deptDo.setLeader(orgDept.getResponsibleId() == null ? "" : orgDept.getResponsibleId().toString());
+                deptDo.setParentId(orgDept.getParentDeptId() == null ? "" : orgDept.getParentDeptId().toString());
+                return deptDo;
+            }
         }
         return null;
     }

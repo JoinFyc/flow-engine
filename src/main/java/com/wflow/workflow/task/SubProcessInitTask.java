@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2023/12/12
  * 子流程初始化任务，用来初始化子流程变量等信息，会在子流程启动后调用
  */

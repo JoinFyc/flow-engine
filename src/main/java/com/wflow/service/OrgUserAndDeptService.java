@@ -8,7 +8,7 @@ import com.wflow.workflow.bean.process.OrgUser;
 import java.util.List;
 
 /**
- * @author : willian fu
+ * @author : JoinFyc
  * @version : 1.0
  */
 public interface OrgUserAndDeptService {

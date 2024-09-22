@@ -3,8 +3,8 @@ package com.wflow.workflow.bean.process.enums;
 import com.wflow.workflow.bean.process.props.*;
 
 /**
- * @author : willian fu
- * @date : 2022/7/6
+ * @author : JoinFyc
+ * @date : 2024/7/6
  */
 public enum NodeTypeEnum {
 

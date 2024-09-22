@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * 设置json类型变量，使对象类型字段存储为json格式字符串且不影响之前的数据
  *
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2024/3/11
  */
 public class JsonVariableType implements VariableType {

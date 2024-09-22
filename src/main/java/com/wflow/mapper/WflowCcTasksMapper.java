@@ -8,8 +8,8 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * @author : willian fu
- * @date : 2022/9/8
+ * @author : JoinFyc
+ * @date : 2024/9/8
  */
 public interface WflowCcTasksMapper extends BaseMapper<WflowCcTasks> {
 

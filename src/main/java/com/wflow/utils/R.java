@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 /**
- * @author : willian fu
+ * @author : JoinFyc
  * @version : 1.0
  */
 public class R {

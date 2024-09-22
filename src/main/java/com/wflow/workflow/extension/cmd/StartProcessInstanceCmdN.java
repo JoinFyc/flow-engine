@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * 自定义流程启动命令，设置流程实例名称
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2024/3/11
  */
 public class StartProcessInstanceCmdN<T> extends StartProcessInstanceCmd<T> {

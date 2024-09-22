@@ -4,8 +4,8 @@ import com.wflow.bean.entity.WflowModelHistorys;
 import com.wflow.bean.vo.CustomPrintConfigVo;
 
 /**
- * @author : willian fu
- * @date : 2022/8/25
+ * @author : JoinFyc
+ * @date : 2024/8/25
  */
 public interface ProcessModelService {
 

@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 /**
  * 内存维护组织机构的用户与部门归属关系
  * 牺牲空间换时间，建立所有 部门->部门、用户->部门 的级联映射
- * @author : willian fu
- * @date : 2022/8/22
+ * @author : JoinFyc
+ * @date : 2024/8/22
  */
 @Slf4j
 @Service

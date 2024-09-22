@@ -11,6 +11,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wflow.bean.FlowProcessContext;
 import com.wflow.bean.entity.WflowModelHistorys;
 import com.wflow.bean.entity.WflowModelPerms;
 import com.wflow.bean.entity.WflowModels;
@@ -20,6 +21,8 @@ import com.wflow.mapper.WflowModelHistorysMapper;
 import com.wflow.mapper.WflowModelPermsMapper;
 import com.wflow.mapper.WflowModelsMapper;
 import com.wflow.service.OrgRepositoryService;
+import com.wflow.utils.RpcUtil;
+import com.wflow.utils.UserUtil;
 import com.wflow.workflow.WFlowToBpmnCreator;
 import com.wflow.workflow.bean.process.OrgUser;
 import com.wflow.workflow.bean.process.ProcessNode;
@@ -47,8 +50,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author : willian fu
- * @date : 2022/8/25
+ * @author : JoinFyc
+ * @date : 2024/8/25
  */
 @Slf4j
 @Service
@@ -161,7 +164,7 @@ public class ProcessModelServiceImpl implements ProcessModelService {
         Deployment deploy = repositoryService.createDeployment()
                 .key(code)
                 .name(wflowModels.getFormName())
-                .tenantId("default") //TODO 租户改造
+                .tenantId(UserUtil.getTenant().getTenantId()) //TODO 租户改造
                 .category(String.valueOf(wflowModels.getGroupId()))
                 .addString(wflowModels.getFormId() + ".bpmn", xmlString)
                 .deploy();

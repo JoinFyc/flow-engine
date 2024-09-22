@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 
 /**
  * json -> bpmn核心转换器
- * @author : willian fu
- * @date : 2022/8/19
+ * @author : JoinFyc
+ * @date : 2024/8/19
  */
 @Slf4j
 public class WFlowToBpmnCreator {

@@ -7,8 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * @author : willian fu
- * @date : 2022/8/15
+ * @author : JoinFyc
+ * @date : 2024/8/15
  */
 public interface AuthService {
 

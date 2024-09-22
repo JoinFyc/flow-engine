@@ -7,8 +7,8 @@ import java.util.Map;
 
 /**
  * 流程节点缓存，快速获取某个流程的某节点设置项
- * @author : willian fu
- * @date : 2022/8/24
+ * @author : JoinFyc
+ * @date : 2024/8/24
  */
 public interface ProcessNodeCacheService {
 

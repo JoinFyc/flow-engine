@@ -3,6 +3,7 @@ package com.wflow.utils;
 import cn.dev33.satoken.stp.StpUtil;
 import com.wflow.bean.FlowProcessContext;
 import com.wflow.bean.do_.LoginDo;
+import com.wflow.bean.vo.TenantVo;
 import org.junit.jupiter.params.aggregator.ArgumentAccessException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -13,8 +14,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
- * @author : willian fu
- * @date : 2022/9/29
+ * @author : JoinFyc
+ * @date : 2024/9/29
  */
 public class UserUtil {
 
@@ -34,6 +35,18 @@ public class UserUtil {
                 throw e;
             }
         }
+    }
+
+    /**
+     * 获取当前用户租户ID
+     * @return TenantVo 租户ID
+     */
+    public static TenantVo getTenant() {
+        final FlowProcessContext flowProcessContext = FlowProcessContext.getFlowProcessContext();
+        if(flowProcessContext == null) {
+            return TenantVo.builder().tenantId("default").build();
+        }
+        return TenantVo.builder().tenantId(flowProcessContext.getTenantId()).build();
     }
 
 }

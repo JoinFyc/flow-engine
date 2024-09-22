@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 /**
  * 抄送任务
  *
- * @author : willian fu
- * @date : 2022/7/15
+ * @author : JoinFyc
+ * @date : 2024/7/15
  */
 @Slf4j
 public class CcServiceTask implements JavaDelegate {

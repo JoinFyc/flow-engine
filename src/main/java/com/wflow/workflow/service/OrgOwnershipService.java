@@ -4,8 +4,8 @@ import java.util.Set;
 
 /**
  * 组织机构级联关系判别辅助服务，默认内存实现，也可以自行用redis实现本接口
- * @author : willian fu
- * @date : 2022/8/22
+ * @author : JoinFyc
+ * @date : 2024/8/22
  */
 public interface OrgOwnershipService {
 

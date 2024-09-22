@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * 重写调用子流程的发起人信息设置逻辑，参考源码中 CallActivityBehavior
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2023/12/19
  */
 @Slf4j

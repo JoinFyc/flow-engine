@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2023/6/16
  * 审批按钮操作权限实体类
  */

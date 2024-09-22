@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author : willian fu
- * @date : 2022/9/20
+ * @author : JoinFyc
+ * @date : 2024/9/20
  */
 @Configuration
 public class MyBatisPlusConfig {

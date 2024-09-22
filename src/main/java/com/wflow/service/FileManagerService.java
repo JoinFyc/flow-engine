@@ -7,8 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 /**
- * @author : willian fu
- * @date : 2022/9/7
+ * @author : JoinFyc
+ * @date : 2024/9/7
  */
 public interface FileManagerService {
 

@@ -1,8 +1,8 @@
 package com.wflow.workflow.bean.process.enums;
 
 /**
- * @author : willian fu
- * @date : 2022/7/7
+ * @author : JoinFyc
+ * @date : 2024/7/7
  */
 public enum ApprovalTypeEnum {
     //指定用户

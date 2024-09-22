@@ -7,8 +7,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author : willian fu
- * @date : 2022/7/6
+ * @author : JoinFyc
+ * @date : 2024/7/6
  */
 @Data
 public class ProcessNode<T> implements Serializable {

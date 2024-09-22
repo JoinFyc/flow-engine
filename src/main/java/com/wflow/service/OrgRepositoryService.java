@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 
 /**
  * 组织架构管理服务，用来快速集成时实现本接口即可对接
- * @author : willian fu
- * @date : 2022/11/29
+ * @author : JoinFyc
+ * @date : 2024/08/29
  */
 public interface OrgRepositoryService {
 

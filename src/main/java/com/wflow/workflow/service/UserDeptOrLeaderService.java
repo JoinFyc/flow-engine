@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author : willian fu
- * @date : 2022/8/22
+ * @author : JoinFyc
+ * @date : 2024/8/22
  */
 public interface UserDeptOrLeaderService {
 

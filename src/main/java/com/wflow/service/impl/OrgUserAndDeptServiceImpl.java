@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author : willian fu
+ * @author : JoinFyc
  * @version : 1.0
  */
 @Service
@@ -55,17 +55,15 @@ public class OrgUserAndDeptServiceImpl implements OrgUserAndDeptService {
         } else {
             //查询当前部门信息
             DeptDo department = orgRepositoryService.getDeptById(deptId);
-            if(department == null){return R.ok(null);}
             //查询子部门信息
             List<OrgTreeVo> subDeptById = orgRepositoryService.getSubDeptById(deptId);
-            if(CollectionUtils.isEmpty(subDeptById)){return R.ok(null);}
-            List<OrgTreeVo> orgs = new LinkedList<>(subDeptById);
+            List<OrgTreeVo> orgs = new LinkedList<>();
+            if(!CollectionUtils.isEmpty(subDeptById)){orgs = new LinkedList<>(subDeptById);}
             if ("user".equals(type) || "org".equals(type)) {
                 List<OrgTreeVo> orgTreeVos = orgRepositoryService.selectUsersByDept(deptId);
-                if(CollectionUtils.isEmpty(orgTreeVos)){return R.ok(null);}
                 orgs.addAll(orgTreeVos.stream().peek(u -> {
-                    u.setIsLeader(StrUtil.isNotBlank(department.getLeader()) && department.getLeader().equals(u.getId()));
-                }).sorted(Comparator.comparing(OrgTreeVo::getIsLeader).reversed()).collect(Collectors.toList()));
+                    u.setIsLeader(department != null && StrUtil.isNotBlank(department.getLeader()) && department.getLeader().equals(u.getId()));
+                }).sorted(Comparator.comparing(OrgTreeVo::getIsLeader).reversed()).toList());
             }
             return R.ok(orgs);
         }

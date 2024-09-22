@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * @author : willian fu
- * @date : 2022/9/20
+ * @author : JoinFyc
+ * @date : 2024/9/20
  */
 @RestController
 @RequestMapping("wflow/notify")

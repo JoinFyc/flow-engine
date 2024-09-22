@@ -1,8 +1,8 @@
 package com.wflow.config;
 
 /**
- * @author : willian fu
- * @date : 2022/8/15
+ * @author : JoinFyc
+ * @date : 2024/8/15
  */
 public interface ResponseCode {
 

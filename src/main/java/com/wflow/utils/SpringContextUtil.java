@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringValueResolver;
 
 /**
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2020/5/26
  */
 @Component

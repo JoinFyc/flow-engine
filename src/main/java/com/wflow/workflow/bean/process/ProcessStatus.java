@@ -2,7 +2,7 @@ package com.wflow.workflow.bean.process;
 
 /**
  * 流程实例状态
- * @author : willian fu
+ * @author : JoinFyc
  * @since : 2024/5/5
  */
 public enum ProcessStatus {

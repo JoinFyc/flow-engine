@@ -11,8 +11,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author : willian fu
- * @date : 2022/11/29
+ * @author : JoinFyc
+ * @date : 2024/08/29
  */
 @Data
 @Builder

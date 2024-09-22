@@ -1,8 +1,8 @@
 package com.wflow.workflow.bean.process.form;
 
 /**
- * @author : willian fu
- * @date : 2022/8/24
+ * @author : JoinFyc
+ * @date : 2024/8/24
  */
 public enum ValueType {
 

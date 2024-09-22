@@ -5,8 +5,8 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * @author : willian fu
- * @date : 2022/8/22
+ * @author : JoinFyc
+ * @date : 2024/8/22
  */
 @Data
 public class FormPerm  implements Serializable {

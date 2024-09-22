@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author : willian fu
- * @date : 2022/9/17
+ * @author : JoinFyc
+ * @date : 2024/9/17
  */
 public interface NotifyService {
     /**

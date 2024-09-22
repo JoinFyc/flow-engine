@@ -8,8 +8,8 @@ import com.wflow.bean.vo.remote.req.FlowModelGroupRequest;
 import java.util.List;
 
 /**
- * @author : willian fu
- * @date : 2022/7/4
+ * @author : JoinFyc
+ * @date : 2024/7/4
  */
 public interface ModelGroupService {
 

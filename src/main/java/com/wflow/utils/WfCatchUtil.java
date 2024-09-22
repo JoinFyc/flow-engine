@@ -7,7 +7,7 @@ import java.util.Objects;
 
 /**
  * 缓存工具类，基于内存的简单超时数据缓存
- * @author : willian fu
+ * @author : JoinFyc
  * @date : 2023/11/13
  */
 public class WfCatchUtil {

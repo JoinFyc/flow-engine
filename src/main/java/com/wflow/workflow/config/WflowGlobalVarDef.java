@@ -6,8 +6,8 @@ import com.wflow.workflow.bean.process.OrgUser;
 import java.util.regex.Pattern;
 
 /**
- * @author : willian fu
- * @date : 2022/9/4
+ * @author : JoinFyc
+ * @date : 2024/9/4
  */
 public class WflowGlobalVarDef {
     //数据库类型，在启动时加载进去

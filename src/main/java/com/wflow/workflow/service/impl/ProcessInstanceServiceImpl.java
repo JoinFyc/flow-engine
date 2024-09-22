@@ -58,8 +58,8 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang3.SystemUtils.getUserName;
 
 /**
- * @author : willian fu
- * @date : 2022/8/23
+ * @author : JoinFyc
+ * @date : 2024/8/23
  */
 @Slf4j
 @Service
@@ -190,6 +190,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         Map<String, Object> ruVariables = runtimeService.getVariables(instanceId);
         String flowUniqueId = (String)ruVariables.get(WflowGlobalVarDef.FLOW_UNIQUE_ID);
         builder.flowUniqueId(flowUniqueId);
+
+        //最后一个审批人标识
+
+
         //先查实例，然后判断是子流程还是主流程
         HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(instanceId).singleResult();

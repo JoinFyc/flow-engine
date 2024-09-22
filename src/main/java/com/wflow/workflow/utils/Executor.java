@@ -5,8 +5,8 @@ import java.util.function.Supplier;
 
 /**
  * 优雅的实现if else等判断，链式编程
- * @author : willian fu
- * @date : 2022/9/12
+ * @author : JoinFyc
+ * @date : 2024/9/12
  */
 public class Executor {
 

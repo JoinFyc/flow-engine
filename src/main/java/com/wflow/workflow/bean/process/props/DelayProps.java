@@ -5,8 +5,8 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * @author : willian fu
- * @date : 2022/7/15
+ * @author : JoinFyc
+ * @date : 2024/7/15
  */
 @Data
 public class DelayProps implements Serializable {

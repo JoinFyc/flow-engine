@@ -10,8 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * @author : willian fu
- * @date : 2022/9/12
+ * @author : JoinFyc
+ * @date : 2024/9/12
  */
 @Configuration
 public class AsyncTaskTheadPoolConfig {

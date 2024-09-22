@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author : willian fu
- * @date : 2022/7/6
+ * @author : JoinFyc
+ * @date : 2024/7/6
  */
 @Data
 public class ApprovalProps implements Serializable {
