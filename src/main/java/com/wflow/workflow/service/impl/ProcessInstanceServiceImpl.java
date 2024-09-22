@@ -147,7 +147,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         //TODO 流程开启 start
         Authentication.setAuthenticatedUserId(userId);
         ProcessInstance processInstance = managementService.executeCommand(new StartProcessInstanceCmdN<>(
-                instanceName, defId, null, processVar, null));
+                instanceName, defId, null, processVar, UserUtil.getTenant().getTenantId()));
         businessDataService.saveInstanceFormData(processInstance.getProcessInstanceId(), params.getFormData());
         log.info("启动 {} 流程实例 {} 成功", processInstance.getProcessDefinitionName(), processInstance.getProcessInstanceId());
         //自动完成发起人节点任务，发起人是一个UserTask，发起后触发start事件然后分配Task给发起人，所以这里要自动完成
