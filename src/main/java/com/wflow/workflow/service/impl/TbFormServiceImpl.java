@@ -13,6 +13,7 @@ import com.wflow.bean.entity.WflowModels;
 import com.wflow.mapper.WflowFormDataMapper;
 import com.wflow.mapper.WflowModelHistorysMapper;
 import com.wflow.mapper.WflowModelsMapper;
+import com.wflow.utils.UserUtil;
 import com.wflow.workflow.bean.process.form.Form;
 import com.wflow.workflow.bean.vo.FormAbstractsVo;
 import com.wflow.workflow.config.WflowGlobalVarDef;
@@ -96,7 +97,7 @@ public class TbFormServiceImpl extends AbstractFormServiceImpl implements FormSe
 
     @Override
     public void saveInstanceFormData(String instanceId, Map<String, Object> formData) {
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(instanceId).singleResult();
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId()).processInstanceId(instanceId).singleResult();
         //提取表单字段信息
         WflowModelHistorys models = historysMapper.selectOne(new LambdaQueryWrapper<WflowModelHistorys>()
                 .select(WflowModelHistorys::getFormItems)

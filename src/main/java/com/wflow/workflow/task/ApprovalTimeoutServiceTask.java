@@ -3,6 +3,7 @@ package com.wflow.workflow.task;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.wflow.utils.SpringContextUtil;
+import com.wflow.utils.UserUtil;
 import com.wflow.workflow.bean.dto.NotifyDto;
 import com.wflow.workflow.bean.process.ProcessNode;
 import com.wflow.workflow.bean.process.enums.NodeTypeEnum;
@@ -60,13 +61,13 @@ public class ApprovalTimeoutServiceTask implements JavaDelegate {
             case PASS: //自动通过处理任务
                 ProcessNode<?> node = nodeCatchService.getProcessNode(execution.getProcessDefinitionId(), split[0]);
                 handlerApprovalTask(execution.getProcessInstanceId(), split[0],
-                        NodeTypeEnum.TASK.equals(node.getType()) ? ProcessHandlerParamsVo.Action.complete: ProcessHandlerParamsVo.Action.agree);
+                        NodeTypeEnum.TASK.equals(node.getType()) ? ProcessHandlerParamsVo.Action.complete: ProcessHandlerParamsVo.Action.agree,execution.getTenantId());
                 break;
             case NOTIFY: //发送通知
                 sendNotify(execution);
                 break;
             default: //自动代替审批人处理拒绝审批
-                handlerApprovalTask(execution.getProcessInstanceId(), split[0], ProcessHandlerParamsVo.Action.refuse);
+                handlerApprovalTask(execution.getProcessInstanceId(), split[0], ProcessHandlerParamsVo.Action.refuse, execution.getTenantId());
                 break;
         }
     }
@@ -76,9 +77,10 @@ public class ApprovalTimeoutServiceTask implements JavaDelegate {
      *
      * @param instanceId 实例ID
      * @param action     处理动作
+     * @param tenantId 租户ID
      */
-    private void handlerApprovalTask(String instanceId, String nodeId, ProcessHandlerParamsVo.Action action) {
-        taskService.createTaskQuery().processInstanceId(instanceId)
+    private void handlerApprovalTask(String instanceId, String nodeId, ProcessHandlerParamsVo.Action action, String tenantId) {
+        taskService.createTaskQuery().taskTenantId(tenantId).processInstanceId(instanceId)
                 .taskDefinitionKey(nodeId).active().list().forEach(task -> {
                     try {
                         String assignee = task.getAssignee();
@@ -101,7 +103,7 @@ public class ApprovalTimeoutServiceTask implements JavaDelegate {
      * @param execution 执行实例
      */
     private void sendNotify(DelegateExecution execution) {
-        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
+        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(execution.getTenantId())
                 .processInstanceId(execution.getProcessInstanceId()).singleResult();
         historyService.createHistoricTaskInstanceQuery().processInstanceId(execution.getProcessInstanceId())
                 .unfinished().list().forEach(task -> {

@@ -147,11 +147,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         //TODO 流程开启 start
         Authentication.setAuthenticatedUserId(userId);
         ProcessInstance processInstance = managementService.executeCommand(new StartProcessInstanceCmdN<>(
-                instanceName, defId, null, processVar, UserUtil.getTenant().getTenantId()));
+                instanceName, defId, null, processVar, UserUtil.getTenantId()));
         businessDataService.saveInstanceFormData(processInstance.getProcessInstanceId(), params.getFormData());
         log.info("启动 {} 流程实例 {} 成功", processInstance.getProcessDefinitionName(), processInstance.getProcessInstanceId());
         //自动完成发起人节点任务，发起人是一个UserTask，发起后触发start事件然后分配Task给发起人，所以这里要自动完成
-        Task rootTask = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).active().singleResult();
+        Task rootTask = taskService.createTaskQuery().taskTenantId(UserUtil.getTenantId()).processInstanceId(processInstance.getProcessInstanceId()).active().singleResult();
         if (Objects.nonNull(rootTask)) {
             rootTask.setDescription(ProcessHandlerParamsVo.Action.complete.toString());
             taskService.complete(rootTask.getId());
@@ -197,7 +197,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         if(approvalUsers.contains(UserUtil.getLoginUserId())){builder.lastAudit(true);}
 
         //先查实例，然后判断是子流程还是主流程
-        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
+        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId())
                 .processInstanceId(instanceId).singleResult();
         //数据分类 表单配置及数据、审批任务结果、
         ProcessInstanceOwnerDto owner = null;
@@ -211,7 +211,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         HistoricProcessInstance mainInst = isSub ? null : instance;
         if (isSub) {
             //查出主流程表单数据
-            mainInst = historyService.createHistoricProcessInstanceQuery()
+            mainInst = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId())
                     .processInstanceId(instance.getSuperProcessInstanceId()).singleResult();
             formDatas = businessDataService.getProcessInstanceFormData(mainInst.getId());
         }
@@ -390,6 +390,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                         node.setNodeType(NodeTypeEnum.SUBPROC);
                         //取子流程实例
                         HistoricProcessInstance subInst = historyService.createHistoricProcessInstanceQuery()
+                                .processInstanceTenantId(UserUtil.getTenantId())
                                 .processInstanceId(his.getCalledProcessInstanceId())
                                 .singleResult();
                         userSet.add(subInst.getStartUserId());
@@ -454,14 +455,14 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public List<Task> getProcessInstanceTaskList(String instanceId) {
-        return taskService.createTaskQuery().processInstanceId(instanceId).active().list();
+        return taskService.createTaskQuery().taskTenantId(UserUtil.getTenantId()).processInstanceId(instanceId).active().list();
     }
 
     @Override
     public Page<ProcessInstanceVo> getUserSubmittedList(Integer pageSize, Integer pageNo, String startUser, String code,
                                                         Boolean finished, String[] startTimes, String keyword, String fieldId, String fieldVal) {
 
-        HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery();
+        HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId());
         Executor.builder()
                 .ifNotBlankNext(startUser, instanceQuery::startedBy)
                 .ifNotBlankNext(code, instanceQuery::processDefinitionKey)
@@ -497,7 +498,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public Page<ProcessInstanceVo> getCcMeInstance(Integer pageSize, Integer pageNo, String code, String[] startTimes) {
         LambdaQueryWrapper<WflowCcTasks> queryWrapper = new LambdaQueryWrapper<WflowCcTasks>()
                 .eq(WflowCcTasks::getUserId, this.getUserId());
-        HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery();
+        HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId());
         Executor.builder()
                 .ifNotBlankNext(code, v -> queryWrapper.eq(WflowCcTasks::getCode, code))
                 .ifNotBlankNext(code, instanceQuery::processDefinitionKey)
@@ -538,8 +539,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public InstanceCountVo getProcessInstanceCount() {
         String userId = UserUtil.getLoginUserId();
         Long cc = ccTasksMapper.selectCount(new LambdaQueryWrapper<WflowCcTasks>().eq(WflowCcTasks::getUserId, userId));
-        Long todo = taskService.createTaskQuery().taskCandidateOrAssigned(userId).count();
-        Long mySubmited = historyService.createHistoricProcessInstanceQuery().startedBy(userId).unfinished().count();
+        Long todo = taskService.createTaskQuery().taskTenantId(UserUtil.getTenantId()).taskCandidateOrAssigned(userId).count();
+        Long mySubmited = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId()).startedBy(userId).unfinished().count();
         return InstanceCountVo.builder().todo(todo).mySubmited(mySubmited).cc(cc.intValue()).build();
     }
 
@@ -614,7 +615,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             return instanceVo;
         }).collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(runInst.keySet())) {
-            taskService.createTaskQuery().processInstanceIdIn(runInst.keySet()).active().list().stream()
+            taskService.createTaskQuery().taskTenantId(UserUtil.getTenantId()).processInstanceIdIn(runInst.keySet()).active().list().stream()
                     .collect(Collectors.groupingBy(Task::getProcessInstanceId)).forEach((istId, tasks) -> {
                         Optional.ofNullable(runInst.get(istId)).ifPresent(ist -> {
                             ist.setNodeId(Optional.ofNullable(ist.getNodeId()).orElseGet(() -> {

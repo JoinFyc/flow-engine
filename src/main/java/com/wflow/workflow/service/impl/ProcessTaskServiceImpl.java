@@ -148,7 +148,7 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
         Map<String, Object> startDept = FlowableUtils.getProcessVars(instanceIds, WflowGlobalVarDef.START_DEPT);
         //把待办任务流程实例一次性取出来，减少查询次数
         Map<String, ProcessInstance> instanceMap = CollectionUtil.isNotEmpty(taskList) ?
-                runtimeService.createProcessInstanceQuery().processInstanceIds(taskList.stream()
+                runtimeService.createProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId()).processInstanceIds(taskList.stream()
                                 .map(Task::getProcessInstanceId).collect(Collectors.toSet()))
                         .list().stream().collect(Collectors.toMap(ProcessInstance::getId, v -> v)) : new HashMap<>();
         List<ProcessTaskVo> taskVos = taskList.stream().map(task -> {
@@ -206,7 +206,7 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
         List<HistoricTaskInstance> taskInstances = query.listPage(pageSize * (pageNo - 1), pageSize);
         //把已办任务流程实例一次性取出来，减少查询次数
         Map<String, HistoricProcessInstance> instanceMap = CollectionUtil.isNotEmpty(taskInstances) ?
-                historyService.createHistoricProcessInstanceQuery().processInstanceIds(taskInstances.stream()
+                historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId()).processInstanceIds(taskInstances.stream()
                                 .map(HistoricTaskInstance::getProcessInstanceId).collect(Collectors.toSet()))
                         .list().stream().collect(Collectors.toMap(HistoricProcessInstance::getId, v -> v)) : new HashMap<>();
         Page<ProcessTaskVo> page = new Page<>();
@@ -275,7 +275,7 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
         Authentication.setAuthenticatedUserId(taskUser);
         Task task = null;
         if (StrUtil.isNotBlank(params.getTaskId())) {
-            task = taskService.createTaskQuery().taskId(params.getTaskId()).active().singleResult();
+            task = taskService.createTaskQuery().taskTenantId(UserUtil.getTenantId()).taskId(params.getTaskId()).active().singleResult();
         }
         boolean isComment = ProcessHandlerParamsVo.Action.comment.equals(params.getAction());
         boolean isCancel = ProcessHandlerParamsVo.Action.cancel.equals(params.getAction());
@@ -428,7 +428,7 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
         try {
             Set<String> idSet = new LinkedHashSet<>();
             context.put("root", instance.getStartUserId());
-            taskService.createTaskQuery().processInstanceId(instance.getId()).active().list()
+            taskService.createTaskQuery().taskTenantId(UserUtil.getTenantId()).processInstanceId(instance.getId()).active().list()
                     .stream().map(TaskInfo::getTaskDefinitionKey)
                     .collect(Collectors.toSet()).forEach(nodeId -> {
                         //根据每个活动的节点进行遍历，最终它们会在合流点汇聚
@@ -548,10 +548,10 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
 
     @Override
     public List<HisApprovalNodeVo> getRecallTaskNodes(String instanceId, String taskId) {
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(instanceId).singleResult();
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId()).processInstanceId(instanceId).singleResult();
         //获取当前用户的所有待审批任务
         String userId = UserUtil.getLoginUserId();
-        Task task = taskService.createTaskQuery().processInstanceId(instanceId).taskCandidateOrAssigned(userId).taskId(taskId).active().singleResult();
+        Task task = taskService.createTaskQuery().taskTenantId(UserUtil.getTenantId()).processInstanceId(instanceId).taskCandidateOrAssigned(userId).taskId(taskId).active().singleResult();
         if (Objects.isNull(task)) {
             throw new BusinessException("该任务不存在");
         }
@@ -585,7 +585,7 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
 
     @Override
     public NodeSettingsVo getNodeTaskSettings(String taskId) {
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        Task task = taskService.createTaskQuery().taskTenantId(UserUtil.getTenantId()).taskId(taskId).singleResult();
         if (Objects.isNull(task)) {
             throw new BusinessException("该任务已被处理，请刷新数据");
         }
@@ -636,7 +636,7 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
     @Transactional
     public void workHandover(String sourceUser, String targetUser) {
         //工作交接的话，先把在途的所有流程全部执行转交，然后设置一个永久期限的审批代理人
-        taskService.createTaskQuery().taskAssignee(sourceUser).active().list().forEach(task -> {
+        taskService.createTaskQuery().taskTenantId(UserUtil.getTenantId()).taskAssignee(sourceUser).active().list().forEach(task -> {
             /*task.setOwner(sourceUser);
             task.setAssignee(targetUser);*/
             taskService.setOwner(task.getId(), sourceUser);
@@ -822,7 +822,7 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
         managementService.executeCommand(new RecallToHisApprovalNodeCmd(runtimeService, params.getTaskId(), params.getTargetNode()));
         if ("root".equals(params.getTargetNode())) {
             //如果是退回发起人节点，那么推送一条通知消息，因为发起人节点没有设置任务监听器，所以不会触发UserTaskListener
-            ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+            ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId()).processInstanceId(task.getProcessInstanceId()).singleResult();
             notifyService.notify(NotifyDto.builder()
                     .title("您的审批被退回")
                     .instanceId(task.getProcessInstanceId())

@@ -2,6 +2,7 @@ package com.wflow.workflow.config.listener;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
+import com.wflow.utils.UserUtil;
 import com.wflow.workflow.bean.dto.NotifyDto;
 import com.wflow.workflow.bean.process.ProcessStatus;
 import com.wflow.workflow.config.WflowGlobalVarDef;
@@ -100,6 +101,7 @@ public class GlobalTaskListener extends AbstractFlowableEngineEventListener impl
 
     @Override
     protected void processCompleted(FlowableEngineEntityEvent event) {
+        //TODO检查多租户改造事件监听
         ProcessInstance instance = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(event.getProcessInstanceId())
                 .singleResult();

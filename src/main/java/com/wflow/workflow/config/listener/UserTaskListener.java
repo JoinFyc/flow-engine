@@ -159,7 +159,7 @@ public class UserTaskListener implements TaskListener{
         String dfId = delegateTask.getProcessDefinitionId();
         String startUser = String.valueOf(delegateTask.getVariable(WflowGlobalVarDef.INITIATOR));
         String assignee = delegateTask.getAssignee();
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceTenantId(delegateTask.getTenantId())
                 .processInstanceId(instanceId).singleResult();
         String defName = "??";
         if (Objects.nonNull(processInstance)) {

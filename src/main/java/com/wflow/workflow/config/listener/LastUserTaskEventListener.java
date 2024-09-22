@@ -45,7 +45,7 @@ public class LastUserTaskEventListener implements TaskListener {
         if (params == null) return;
 
         //最后一个用户任务完成
-        if (!Objects.equals(delegateTask.getEventName(), "complete") && taskService.createTaskQuery()
+        if (!Objects.equals(delegateTask.getEventName(), "complete") && taskService.createTaskQuery().taskTenantId(delegateTask.getTenantId())
                 .processInstanceId(delegateTask.getProcessInstanceId())
                 .active()
                 .count() == 0) return;

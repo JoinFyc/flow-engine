@@ -164,7 +164,7 @@ public class ProcessModelServiceImpl implements ProcessModelService {
         Deployment deploy = repositoryService.createDeployment()
                 .key(code)
                 .name(wflowModels.getFormName())
-                .tenantId(UserUtil.getTenant().getTenantId()) //TODO 租户改造
+                .tenantId(UserUtil.getTenantId()) //TODO 租户改造
                 .category(String.valueOf(wflowModels.getGroupId()))
                 .addString(wflowModels.getFormId() + ".bpmn", xmlString)
                 .deploy();
@@ -261,7 +261,7 @@ public class ProcessModelServiceImpl implements ProcessModelService {
     @Override
     public CustomPrintConfigVo getCustomPrintConfig(String instanceId) {
         try {
-            HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().processInstanceId(instanceId).singleResult();
+            HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId()).processInstanceId(instanceId).singleResult();
             WflowModelHistorys modelHistory = modelHistorysMapper.selectOne(
                     new LambdaQueryWrapper<WflowModelHistorys>()
                             .select(WflowModelHistorys::getSettings)

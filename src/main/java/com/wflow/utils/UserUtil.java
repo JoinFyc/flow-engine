@@ -38,7 +38,7 @@ public class UserUtil {
     }
 
     /**
-     * 获取当前用户租户ID
+     * 获取当前用户租户
      * @return TenantVo 租户ID
      */
     public static TenantVo getTenant() {
@@ -47,6 +47,14 @@ public class UserUtil {
             return TenantVo.builder().tenantId("default").build();
         }
         return TenantVo.builder().tenantId(flowProcessContext.getTenantId()).build();
+    }
+
+    /**
+     * 获取当前用户租户ID
+     * @return TenantVo 租户ID
+     */
+    public static String getTenantId() {
+        return getTenant().getTenantId();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.wflow.org;
 
+import com.wflow.utils.UserUtil;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -52,7 +53,7 @@ public class FlowableExample {
         taskService.complete(task.getId());
 
         // 查询历史
-        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(UserUtil.getTenantId()).processInstanceId(processInstance.getId()).singleResult();
 
         // 打印历史信息
         System.out.println("Historic Process Instance: " + historicProcessInstance.getProcessDefinitionId());
