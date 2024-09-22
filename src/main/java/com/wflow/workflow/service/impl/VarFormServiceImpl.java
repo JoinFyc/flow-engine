@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.wflow.bean.entity.WflowFormRecord;
+import com.wflow.utils.UserUtil;
 import com.wflow.workflow.service.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
@@ -53,9 +54,10 @@ public class VarFormServiceImpl extends AbstractFormServiceImpl implements FormS
             formData = runtimeService.getVariables(instanceId, fieldIds);
         } catch (Exception e) {
             formData = historyService.createNativeHistoricVariableInstanceQuery()
-                    .sql(StrUtil.builder().append("select * from ACT_HI_VARINST where PROC_INST_ID_ = #{instanceId} and NAME_ in ('")
+                    .sql(StrUtil.builder().append("select * from ACT_HI_VARINST where PROC_INST_ID_ = #{instanceId} and TENANT_ID_ = #{tenantId} and NAME_ in ('")
                             .append(String.join("','", fieldIds)).append("')").toString())
                     .parameter("instanceId", instanceId)
+                    .parameter("tenantId", UserUtil.getTenantId())
                     .list()
                     .stream().collect(Collectors.toMap(
                             HistoricVariableInstance::getVariableName,
