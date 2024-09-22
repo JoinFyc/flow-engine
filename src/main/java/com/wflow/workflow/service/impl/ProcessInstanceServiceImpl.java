@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -135,11 +136,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         processVar.put(WflowGlobalVarDef.INITIATOR, userId);
         processVar.put(WflowGlobalVarDef.FLOW_UNIQUE_ID, params.getFlowUniqueId());
         //最终审批人的事件Key
-        if(StrUtil.isNotBlank(wflowModels.getBusinessEventKey())) {
-            final ProcessNode<?> lastNode = Objects.requireNonNull(nodeMap.entrySet().stream().reduce((first, second) -> second).orElse(null)).getValue();
-            //TODO 组装事件请求参数
-            processVar.put(WflowGlobalVarDef.LAST_AUDIT_EVENT_TAG,lastNode.getProps());
-        }
+        final ProcessNode<?> lastNode = Objects.requireNonNull(nodeMap.entrySet().stream().reduce((first, second) -> second).orElse(null)).getValue();
+        processVar.put(WflowGlobalVarDef.LAST_AUDIT_EVENT_TAG,lastNode.getProps());
+
         //构造流程实例名称
         final UserDo user = orgRepositoryService.getUserById(userId);
         if(user == null){throw new BusinessException("用户不存在"); }
@@ -192,7 +191,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         builder.flowUniqueId(flowUniqueId);
 
         //最后一个审批人标识
-
+        Object o = ruVariables.get(WflowGlobalVarDef.LAST_AUDIT_EVENT_TAG);
+        ApprovalProps props = JSON.parseObject(JSON.toJSONString(o), ApprovalProps.class);
+        final List<String> approvalUsers = processTaskService.getApprovalUsers(instanceId,nodeId, props);
+        if(approvalUsers.contains(UserUtil.getLoginUserId())){builder.lastAudit(true);}
 
         //先查实例，然后判断是子流程还是主流程
         HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()

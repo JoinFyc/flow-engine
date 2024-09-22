@@ -14,11 +14,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wflow.bean.do_.UserDeptDo;
 import com.wflow.bean.do_.UserDo;
 import com.wflow.bean.entity.WflowModelHistorys;
-import com.wflow.bean.entity.WflowModels;
 import com.wflow.bean.entity.WflowUserAgents;
 import com.wflow.exception.BusinessException;
 import com.wflow.mapper.WflowModelHistorysMapper;
-import com.wflow.mapper.WflowModelsMapper;
 import com.wflow.mapper.WflowUserAgentsMapper;
 import com.wflow.service.OrgRepositoryService;
 import com.wflow.utils.UserUtil;
@@ -38,13 +36,11 @@ import com.wflow.workflow.service.*;
 import com.wflow.workflow.utils.Executor;
 import com.wflow.workflow.utils.FlowableUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.ExecutionGraphUtil;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -662,6 +658,7 @@ public class ProcessTaskServiceImpl implements ProcessTaskService {
      * @param props      节点熟悉
      * @return 审批人ID列表
      */
+    @Override
     public List<String> getApprovalUsers(String instanceId, String nodeId, ApprovalProps props) {
         String userId = runtimeService.getVariable(instanceId, WflowGlobalVarDef.INITIATOR, String.class);
         String deptId = runtimeService.getVariable(instanceId, WflowGlobalVarDef.START_DEPT, String.class);

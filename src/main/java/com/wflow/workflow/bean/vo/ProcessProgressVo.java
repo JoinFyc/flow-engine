@@ -28,6 +28,8 @@ public class ProcessProgressVo {
 
     //流程唯一业务ID
     private String flowUniqueId;
+    //最后一个审批人标识
+    private Boolean lastAudit = Boolean.FALSE;
     //审批实例ID
     private String instanceId;
     //表单配置项

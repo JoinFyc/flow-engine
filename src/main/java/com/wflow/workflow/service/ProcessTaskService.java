@@ -102,4 +102,5 @@ public interface ProcessTaskService {
      */
     void workHandover(String sourceUser, String targetUser);
 
+    List<String> getApprovalUsers(String instanceId, String nodeId, ApprovalProps props);
 }
