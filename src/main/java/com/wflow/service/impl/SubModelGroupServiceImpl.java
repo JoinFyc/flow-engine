@@ -13,6 +13,7 @@ import com.wflow.exception.BusinessException;
 import com.wflow.mapper.WflowSubGroupsMapper;
 import com.wflow.mapper.WflowSubProcessMapper;
 import com.wflow.service.SubModelGroupService;
+import com.wflow.utils.UserUtil;
 import com.wflow.workflow.WFlowToBpmnCreator;
 import com.wflow.workflow.bean.process.ProcessNode;
 import lombok.extern.slf4j.Slf4j;
@@ -142,7 +143,7 @@ public class SubModelGroupServiceImpl implements SubModelGroupService {
         Deployment deploy = repositoryService.createDeployment()
                 .key(process.getProcCode())
                 .name(process.getProcName())
-                .tenantId("default")
+                .tenantId(UserUtil.getTenantId())
                 .addString(process.getProcCode() + ".bpmn", xmlString)
                 .deploy();
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
