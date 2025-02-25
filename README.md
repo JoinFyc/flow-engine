@@ -1,10 +1,8 @@
-## wflow-pro 后端
+## flow-engine 后端
 
 #### 📌 pro私有仓库禁止 直接fork，否则永久移出仓库，请遵循授权协议使用
 
 #### 📢 严禁私下传播、倒卖等未经授权侵犯知识产权的使用行为
-
-使用方式及文档参见官网 [wflow-pro](http://wflow.willianfu.top/docs/dev-pro/project.html)
 
 ## 注意，后端版本 >= 1.5.0 的用户
 > 在流程引擎 act_xxx 表创建成功后，请将流程变量表
